@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GRIMM Trading Hub | Advanced Deriv Trading Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#050608;--bg2:#0c0d12;--bg3:#111318;--bg4:#181a22;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+      --text:#e2e4ed;--text2:#8a8fa8;--text3:#454a5e;
+      --cyan:#00e5ff;--cyan-dim:rgba(0,229,255,0.08);--cyan-mid:rgba(0,229,255,0.18);
+      --green:#00ff88;--green-dim:rgba(0,255,136,0.08);
+      --red:#ff3355;--red-dim:rgba(255,51,85,0.08);
+      --amber:#ffaa00;
+      --font:'Space Grotesk',system-ui,sans-serif;
+      --mono:'JetBrains Mono',monospace;
+      --r:8px;--r-lg:16px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+    /* TICKER */
+    .ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 0;overflow:hidden;position:relative}
+    .ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2}
+    .ticker-wrap::before{left:0;background:linear-gradient(to right,var(--bg2),transparent)}
+    .ticker-wrap::after{right:0;background:linear-gradient(to left,var(--bg2),transparent)}
+    .ticker-track{display:flex;gap:0;white-space:nowrap;animation:ticker 30s linear infinite}
+    @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .tick-item{display:inline-flex;align-items:center;gap:8px;padding:0 24px;font-family:var(--mono);font-size:12px;border-right:1px solid var(--border)}
+    .tick-sym{color:var(--text2)}
+    .tick-price{color:var(--text);font-weight:500}
+    .tick-up{color:var(--green)}
+    .tick-down{color:var(--red)}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,6,8,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:0.1em;color:var(--cyan)}
+    .nav-logo span{color:var(--text3)}
+    .nav-links{display:flex;align-items:center;gap:32px}
+    .nav-links a{color:var(--text2);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;transition:color 0.2s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-actions{display:flex;gap:10px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);letter-spacing:0.02em;transition:all 0.2s;text-decoration:none}
+    .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+    .btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+    .btn-cyan{background:var(--cyan);color:#000}
+    .btn-cyan:hover{background:#33eaff;box-shadow:0 0 20px rgba(0,229,255,0.3)}
+    .btn-green{background:var(--green);color:#000;font-weight:700}
+    .btn-green:hover{background:#33ffaa;box-shadow:0 0 20px rgba(0,255,136,0.3)}
+    .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);width:100%;justify-content:center;padding:11px 20px}
+    .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+
+    /* HERO */
+    .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;position:relative;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;z-index:0}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:60px 60px}
+    .hero-glow{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,0.06) 0%,transparent 70%);pointer-events:none}
+    .hero-inner{position:relative;z-index:1;max-width:800px}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--cyan-dim);border:1px solid rgba(0,229,255,0.2);border-radius:99px;padding:5px 14px;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:28px;font-family:var(--mono)}
+    .hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    h1{font-size:clamp(40px,7vw,80px);font-weight:700;line-height:1.05;letter-spacing:-0.03em;margin-bottom:24px}
+    h1 .word-accent{color:var(--cyan)}
+    h1 .word-accent2{color:var(--green)}
+    .hero-sub{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 40px;line-height:1.7}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+    /* MARQUEE STATS */
+    .stats-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);padding:18px 40px;display:flex;justify-content:center;gap:60px;flex-wrap:wrap}
+    .stat-item{text-align:center}
+    .stat-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--cyan)}
+    .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+
+    /* SECTIONS */
+    section{padding:100px 40px}
+    .section-inner{max-width:1100px;margin:0 auto}
+    .section-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyan);font-family:var(--mono);margin-bottom:12px}
+    .section-title{font-size:clamp(28px,4vw,46px);font-weight:700;letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px}
+    .section-sub{font-size:16px;color:var(--text2);max-width:520px;line-height:1.7;margin-bottom:56px}
+
+    /* FEATURES */
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .feature-card{background:var(--bg2);padding:28px;transition:background 0.2s}
+    .feature-card:hover{background:var(--bg3)}
+    .feature-icon{width:40px;height:40px;border-radius:var(--r);background:var(--cyan-dim);border:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px}
+    .feature-title{font-size:15px;font-weight:600;margin-bottom:8px}
+    .feature-desc{font-size:13px;color:var(--text2);line-height:1.65}
+
+    /* BOTS */
+    .bots-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+    .bot-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;transition:all 0.2s;position:relative;overflow:hidden}
+    .bot-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--green))}
+    .bot-card:hover{border-color:rgba(0,229,255,0.2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+    .bot-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+    .bot-name{font-size:16px;font-weight:600}
+    .bot-emoji{font-size:20px}
+    .bot-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:0.06em;text-transform:uppercase;font-family:var(--mono)}
+    .tag-aggressive{background:rgba(255,51,85,0.15);color:var(--red)}
+    .tag-moderate{background:rgba(255,170,0,0.12);color:var(--amber)}
+    .tag-safe{background:rgba(0,255,136,0.1);color:var(--green)}
+    .bot-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px}
+    .bot-stats{display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--border)}
+    .bot-winrate{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--green)}
+    .bot-winrate span{font-size:11px;color:var(--text3);font-weight:400;display:block}
+    .bot-market{font-size:11px;color:var(--text3);text-align:right}
+    .bot-market strong{display:block;color:var(--cyan);font-family:var(--mono)}
+
+    /* STEPS */
+    .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:32px;position:relative}
+    .step{position:relative;padding-left:0}
+    .step-num{font-family:var(--mono);font-size:48px;font-weight:700;color:var(--border2);line-height:1;margin-bottom:16px}
+    .step-title{font-size:17px;font-weight:600;margin-bottom:8px}
+    .step-desc{font-size:14px;color:var(--text2);line-height:1.65}
+
+    /* LOGIN MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);width:100%;max-width:440px;overflow:hidden}
+    .modal-header{padding:24px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-size:16px;font-weight:600}
+    .modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;padding:4px}
+    .modal-close:hover{color:var(--text)}
+    .modal-body{padding:28px}
+    .modal-tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:24px}
+    .modal-tab{flex:1;padding:8px;text-align:center;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.2s}
+    .modal-tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .oauth-info{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:20px;font-size:13px;color:var(--text2);line-height:1.6}
+    .input-group{margin-bottom:16px}
+    .input-label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-family:var(--mono)}
+    input[type="text"],input[type="password"]{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:border-color 0.2s}
+    input:focus{border-color:var(--cyan)}
+    .token-hint{font-size:12px;color:var(--text3);margin-top:6px}
+    .token-hint a{color:var(--cyan);text-decoration:none}
+
+    /* CTA */
+    .cta-section{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center}
+    .cta-section .section-title{margin-bottom:12px}
+    .cta-section .section-sub{margin:0 auto 40px}
+
+    /* FOOTER */
+    footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+    .footer-logo{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--cyan);letter-spacing:0.1em}
+    .footer-copy{font-size:12px;color:var(--text3)}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      nav{padding:0 20px}
+      .nav-links{display:none}
+      section{padding:70px 20px}
+      .stats-bar{gap:32px;padding:18px 20px}
+      footer{padding:24px 20px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div style="padding-top:64px">
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="ticker"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">GRIMM<span>_</span></div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#bots">Bots</a>
+    <a href="#how-it-works">How It Works</a>
+  </div>
+  <div class="nav-actions">
+    <a href="https://partner-tracking.deriv.com/click?a=4679&o=1&c=3&link_id=1" target="_blank" class="btn btn-outline">Create Account</a>
+    <button class="btn btn-cyan" onclick="openModal()">Connect Deriv</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Live Trading Platform</div>
+    <h1>Trade <span class="word-accent">Smarter.</span><br>Win <span class="word-accent2">More.</span></h1>
+    <p class="hero-sub">Advanced automated trading bots, real-time market data, and seamless Deriv OAuth integration. One platform to rule all your trades.</p>
+    <div class="hero-actions">
+      <a href="https://partner-tracking.deriv.com/click?a=4679&o=1&c=3&link_id=1" target="_blank" class="btn btn-green">⚡ Create Deriv Account</a>
+      <button class="btn btn-outline" onclick="openModal()">Connect Deriv Account</button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-val">6+</div><div class="stat-label">Trading Bots</div></div>
+  <div class="stat-item"><div class="stat-val">24/7</div><div class="stat-label">Automated</div></div>
+  <div class="stat-item"><div class="stat-val">Live</div><div class="stat-label">Tick Data</div></div>
+  <div class="stat-item"><div class="stat-val">OAuth</div><div class="stat-label">Secure Login</div></div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-eyebrow">Platform Features</div>
+    <h2 class="section-title">Everything you need<br>to trade professionally</h2>
+    <p class="section-sub">Built for traders who want speed, automation, and edge in every market condition.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-title">Automated Trading Bots</div>
+        <p class="feature-desc">Deploy pre-built or custom bots that trade 24/7. Martingale, D'Alembert, and custom strategies fully automated.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <div class="feature-title">Secure OAuth Login</div>
+        <p class="feature-desc">Login with your Deriv account securely via OAuth 2.0. We never store your passwords or tokens.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">Real-Time Charts</div>
+        <p class="feature-desc">Live tick data streamed directly from Deriv WebSocket API. Watch your positions and market moves in real time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <div class="feature-title">Multi-Account Support</div>
+        <p class="feature-desc">Manage multiple Deriv accounts — real and demo — from a single dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <div class="feature-title">Risk Management</div>
+        <p class="feature-desc">Set stop-loss limits, profit targets, and max trade counts. Your capital stays protected.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Trade History</div>
+        <p class="feature-desc">Full trade logs with P&L analytics. Understand what works and refine your strategy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTS -->
+<section id="bots" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="section-inner">
+    <div class="section-eyebrow">Trading Bots</div>
+    <h2 class="section-title">Battle-tested strategies,<br>automated</h2>
+    <p class="section-sub">Six proven strategies ready to deploy — configure and run in minutes.</p>
+    <div class="bots-grid">
+      <div class="bot-card">
+        <div class="bot-header">
+          <div>
+            <div class="bot-emoji">🤖</div>
+            <div class="bot-name">Martingale Pro</div>
+          </div>
+          <span class="bot-tag tag-aggressive">Aggressive</span>
+        </div>
+        <p class="bot-desc">Classic Martingale with smart doubling on losses. Configurable max steps and base stake.</p>
+        <div class="bot-stats">
+          <div class="bot-winrate">+68%<span>Win Rate</span></div>
+          <div class="bot-market">Market<strong>Rise/Fall</strong></div>
+        </div>
+      </div>
+      <div class="bot-card">
+        <div class="bot-header">
+          <div>
+            <div class="bot-emoji">📈</div>
+            <div class="bot-name">D'Alembert</div>
+          </div>
+          <span class="bot-tag tag-moderate">Moderate</span>
+        </div>
+        <p class="bot-desc">Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale.</p>
+        <div class="bot-stats">
+          <div class="bot-winrate">+72%<span>Win Rate</span></div>
+          <div class="bot-market">Market<strong>Digits</strong></div>
+        </div>
+      </div>
+      <div class="bot-card">
+        <div class="bot-header">
+          <div>
+            <div class="bot-emoji">🔁</div>
+            <div class="bot-name">Accumulator</div>
+          </div>
+          <span class="bot-tag tag-safe">Safe</span>
+        </div>
+        <p class="bot-desc">Steady accumulation with configurable growth rates. Minimal risk with consistent compounding.</p>
+        <div class="bot-stats">
+          <div class="bot-winrate">+81%<span>Win Rate</span></div>
+          <div class="bot-market">Market<strong>Accum.</strong></div>
+        </div>
+      </div>
+      <div class="bot-card">
+        <div class="bot-header">
+          <div>
+            <div class="bot-emoji">💥</div>
+            <div class="bot-name">Boom/Crash</div>
+          </div>
+          <span class="bot-tag tag-aggressive">Aggressive</span>
+        </div>
+        <p class="bot-desc">Specialized for Boom/Crash indices. Catches spike opportunities with auto entry/exit logic.</p>
+        <div class="bot-stats">
+          <div class="bot-winrate">+59%<span>Win Rate</span></div>
+          <div class="bot-market">Market<strong>Boom/Crash</strong></div>
+        </div>
+      </div>
+      <div class="bot-card">
+        <div class="bot-header">
+          <div>
+            <div class="bot-emoji">🎯</div>
+            <div class="bot-name">Even/Odd Digit</div>
+          </div>
+          <span class="bot-tag tag-moderate">Moderate</span>
+        </div>
+        <p class="bot-desc">Analyzes tick patterns to predict Even or Odd last digit. Auto-switches based on streak detection.</p>
+        <div class="bot-stats">
+          <div class="bot-winrate">+65%<span>Win Rate</span></div>
+          <div class="bot-market">Market<strong>R_10/25</strong></div>
+        </div>
+      </div>
+      <div class="bot-card">
+        <div class="bot-header">
+          <div>
+            <div class="bot-emoji">🔬</div>
+            <div class="bot-name">Over/Under</div>
+          </div>
+          <span class="bot-tag tag-safe">Safe</span>
+        </div>
+        <p class="bot-desc">Predicts whether the last digit will be Over or Under a configured barrier. Highly configurable.</p>
+        <div class="bot-stats">
+          <div class="bot-winrate">+77%<span>Win Rate</span></div>
+          <div class="bot-market">Market<strong>Digits</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-inner">
+    <div class="section-eyebrow">Getting Started</div>
+    <h2 class="section-title">Up and trading<br>in 3 steps</h2>
+    <p class="section-sub">From signup to automated trading in minutes.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Connect Your Account</div>
+        <p class="step-desc">Click "Login with Deriv" and authorize via OAuth 2.0. Your credentials stay safe — we only get a secure session token.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Choose Your Bot</div>
+        <p class="step-desc">Browse our bot library and configure your strategy — pick the market, contract type, stake, profit target and stop-loss.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Start Trading</div>
+        <p class="step-desc">Hit Run and let your bot trade. Monitor positions in real time, receive live P&L updates, and stop anytime.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <h2 class="section-title">Ready to trade on autopilot?</h2>
+    <p class="section-sub">Join traders using Grimm to automate their Deriv strategies.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-cyan" onclick="openModal()" style="padding:13px 32px;font-size:15px">Launch Dashboard</button>
+      <a href="https://partner-tracking.deriv.com/click?a=4679&o=1&c=3&link_id=1" target="_blank" class="btn btn-outline" style="padding:13px 32px;font-size:15px">Create Deriv Account</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">⬡ GRIMM.SITE</div>
+  <div class="footer-copy">© 2024 GRIMM.SITE — Powered by Deriv API</div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Connect Your Account</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px">Choose how you want to connect to Deriv.</p>
+      <div class="modal-tabs">
+        <div class="modal-tab active" onclick="switchTab('oauth')">OAuth Login</div>
+        <div class="modal-tab" onclick="switchTab('token')">API Token</div>
+      </div>
+      <div class="tab-panel active" id="tab-oauth">
+        <div class="oauth-info">You'll be redirected to Deriv to authorize. We never see your password.</div>
+        <a href="https://oauth.deriv.com/oauth2/authorize?app_id=1089&response_type=token&redirect_uri=https://dp2pusa-commits.github.io/deriv-app" class="btn btn-cyan" style="width:100%;justify-content:center;padding:12px">Login with Deriv</a>
+      </div>
+      <div class="tab-panel" id="tab-token">
+        <div class="input-group">
+          <label class="input-label">Deriv API Token</label>
+          <input type="password" id="token-input" placeholder="Enter your API token…"/>
+          <div class="token-hint">Get your token: <a href="https://app.deriv.com/account/api-token" target="_blank">app.deriv.com → API Token</a><br>Required scopes: <strong>Read</strong> + <strong>Trade</strong></div>
+        </div>
+        <button class="btn btn-cyan" onclick="connectToken()" style="width:100%;justify-content:center;padding:12px">Connect with Token</button>
+        <div id="token-msg" style="margin-top:12px;font-size:13px;display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Ticker
+const symbols=[{s:'R_10',p:'1234.56',c:'+0.42%',up:true},{s:'R_25',p:'892.14',c:'+1.23%',up:true},{s:'R_50',p:'2341.89',c:'-0.87%',up:false},{s:'R_75',p:'4512.33',c:'+2.15%',up:true},{s:'R_100',p:'7823.01',c:'-1.44%',up:false},{s:'BOOM500',p:'56321.7',c:'+0.92%',up:true},{s:'CRASH500',p:'43210.5',c:'-0.38%',up:false}];
+function buildTicker(){
+  const all=[...symbols,...symbols];
+  return all.map(t=>`<div class="tick-item"><span class="tick-sym">${t.s}</span><span class="tick-price">${t.p}</span><span class="${t.up?'tick-up':'tick-down'}">${t.c}</span></div>`).join('');
+}
+document.getElementById('ticker').innerHTML=buildTicker();
+
+// Live ticks via WS
+let ws;
+function connectWS(){
+  ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws.onopen=()=>{ws.send(JSON.stringify({ticks:'R_100',subscribe:1}))};
+  ws.onmessage=e=>{
+    const d=JSON.parse(e.data);
+    if(d.msg_type==='tick'){
+      const items=document.querySelectorAll('.tick-item');
+      items.forEach(el=>{if(el.querySelector('.tick-sym').textContent===d.tick.symbol){el.querySelector('.tick-price').textContent=parseFloat(d.tick.quote).toFixed(2)}});
+    }
+  };
+  ws.onclose=()=>setTimeout(connectWS,3000);
+}
+connectWS();
+
+// Modal
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal()}
+function switchTab(t){
+  document.querySelectorAll('.modal-tab').forEach((el,i)=>el.classList.toggle('active',i===(t==='oauth'?0:1)));
+  document.getElementById('tab-oauth').classList.toggle('active',t==='oauth');
+  document.getElementById('tab-token').classList.toggle('active',t==='token');
+}
+function connectToken(){
+  const tok=document.getElementById('token-input').value.trim();
+  const msg=document.getElementById('token-msg');
+  if(!tok){msg.style.display='block';msg.style.color='var(--red)';msg.textContent='Please enter your API token.';return}
+  msg.style.display='block';msg.style.color='var(--cyan)';msg.textContent='Connecting…';
+  const ws2=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+  ws2.onopen=()=>ws2.send(JSON.stringify({authorize:tok}));
+  ws2.onmessage=e=>{
+    const d=JSON.parse(e.data);
+    if(d.msg_type==='authorize'&&d.authorize){
+      msg.style.color='var(--green)';
+      msg.textContent='✓ Connected as '+d.authorize.loginid+' — Balance: '+parseFloat(d.authorize.balance).toFixed(2)+' '+d.authorize.currency;
+    }else if(d.error){msg.style.color='var(--red)';msg.textContent='✗ '+d.error.message}
+  };
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+</script>
+</body>
+</html>
