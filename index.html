@@ -321,9 +321,10 @@ footer{padding:24px 20px}
 </div>
 <div class="mtab-panel active" id="mtab-oauth">
 <div class="oauth-info">You'll be redirected to Deriv to authorize. We never see your password — only a secure session token is returned.</div>
-<a href="https://oauth.deriv.com/oauth2/authorize?app_id=33CJP87GpB7SYAAj7OT2M&redirect_uri=https://dp2pusa-commits.github.io/kingsite/" class="btn btn-cyan" style="width:100%;justify-content:center;padding:12px;font-size:14px">
+<button onclick="startOAuth()" class="btn btn-cyan" style="width:100%;justify-content:center;padding:12px;font-size:14px">
 🔐 Login with Deriv
-</a>
+</button>
+<div id="oauth-msg" style="margin-top:12px;font-size:12px;color:var(--text3);text-align:center;display:none"></div>
 <p style="font-size:11px;color:var(--text3);margin-top:12px;text-align:center">After login you'll be redirected back to the dashboard automatically.</p>
 </div>
 <div class="mtab-panel" id="mtab-token">
@@ -699,13 +700,86 @@ document.getElementById('landing').style.display='block';
 lastProposal=null;lastDashPrice=null;tickHistory=[];
 }
 
-// ========== OAUTH REDIRECT HANDLER ==========
-const params=new URLSearchParams(window.location.search);
-const oauthToken=params.get('token1')||params.get('token');
-if(oauthToken){
-window.history.replaceState({},'',window.location.pathname);
-initApp(oauthToken);
+// ========== PKCE OAUTH FLOW ==========
+async function generatePKCE(){
+  const array=crypto.getRandomValues(new Uint8Array(64));
+  const codeVerifier=Array.from(array).map(v=>'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[v%66]).join('');
+  const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(codeVerifier));
+  const codeChallenge=btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const state=crypto.getRandomValues(new Uint8Array(16)).reduce((s,b)=>s+b.toString(16).padStart(2,'0'),'');
+  return {codeVerifier,codeChallenge,state};
 }
+
+async function startOAuth(){
+  const msg=document.getElementById('oauth-msg');
+  msg.style.display='block';msg.textContent='Preparing secure login…';
+  const {codeVerifier,codeChallenge,state}=await generatePKCE();
+  sessionStorage.setItem('pkce_code_verifier',codeVerifier);
+  sessionStorage.setItem('oauth_state',state);
+  const url='https://auth.deriv.com/oauth2/auth'
+    +'?response_type=code'
+    +'&client_id='+APP_ID
+    +'&redirect_uri='+encodeURIComponent(REDIRECT_URI)
+    +'&scope=trade+account_manage'
+    +'&state='+state
+    +'&code_challenge='+codeChallenge
+    +'&code_challenge_method=S256';
+  window.location.href=url;
+}
+
+async function handleOAuthCallback(){
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get('code');
+  const returnedState=params.get('state');
+  const error=params.get('error');
+
+  if(error){
+    window.history.replaceState({},'',window.location.pathname);
+    alert('Login failed: '+error);
+    return;
+  }
+
+  if(!code)return; // no oauth callback, normal page load
+
+  const storedState=sessionStorage.getItem('oauth_state');
+  const codeVerifier=sessionStorage.getItem('pkce_code_verifier');
+
+  if(returnedState!==storedState){
+    window.history.replaceState({},'',window.location.pathname);
+    alert('Security error: state mismatch. Please try again.');
+    return;
+  }
+
+  // Clear storage
+  sessionStorage.removeItem('oauth_state');
+  sessionStorage.removeItem('pkce_code_verifier');
+  window.history.replaceState({},'',window.location.pathname);
+
+  // Exchange code for token
+  try {
+    const resp=await fetch('https://auth.deriv.com/oauth2/token',{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams({
+        grant_type:'authorization_code',
+        client_id:APP_ID,
+        code:code,
+        code_verifier:codeVerifier,
+        redirect_uri:REDIRECT_URI
+      })
+    });
+    const data=await resp.json();
+    if(data.access_token){
+      initApp(data.access_token);
+    } else {
+      alert('Token exchange failed: '+(data.error_description||data.error||JSON.stringify(data)));
+    }
+  } catch(e){
+    alert('Token exchange error: '+e.message);
+  }
+}
+
+handleOAuthCallback();
 </script>
 </body>
 </html>
