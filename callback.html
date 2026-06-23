@@ -194,7 +194,17 @@
 (function() {
   const params = new URLSearchParams(window.location.search);
 
-  // Collect all accounts Deriv returns (acct1/token1, acct2/token2 …)
+  // Handle direct token from API Token login
+  const directToken = params.get('token');
+  if (directToken) {
+    const accounts = [{ account: 'API Token', token: directToken, currency: '' }];
+    sessionStorage.setItem('deriv_accounts', JSON.stringify(accounts));
+    sessionStorage.setItem('deriv_token', directToken);
+    showSuccess(accounts);
+    return;
+  }
+
+  // Collect all accounts Deriv returns via OAuth (acct1/token1, acct2/token2 …)
   const accounts = [];
   let i = 1;
   while (params.get('acct' + i)) {
