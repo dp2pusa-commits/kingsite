@@ -846,11 +846,10 @@
       <button class="tab-btn active" onclick="switchTab('oauth', this)">OAuth Login</button>
       <button class="tab-btn" onclick="switchTab('token', this)">API Token</button>
     </div>
-    <div id="tab-oauth" class="tab-panel active">
-      <!-- ⚠️ UPDATE THIS HREF with your Deriv OAuth app URL -->
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=33Dg2mvJU7l5aIjukYAvN" class="modal-btn-deriv" target="_blank">
+
+      <button class="modal-btn-deriv" onclick="loginWithDeriv()">
         🔗 Login with Deriv
-      </a>
+      </button>
       <p class="modal-hint">You'll be redirected to Deriv to authorize. We never see your password.</p>
     </div>
     <div id="tab-token" class="tab-panel">
@@ -882,10 +881,18 @@
     document.getElementById('tab-' + name).classList.add('active');
     btn.classList.add('active');
   }
+  function loginWithDeriv() {
+    const appId = '33Dg2mvJU7l5aIjukYAvN';
+    const redirectUri = encodeURIComponent('https://dp2pusa-commits.github.io/kingsite/callback');
+    const affiliateToken = '29953';
+    const oauthUrl = 'https://oauth.deriv.com/oauth2/authorize?app_id=' + appId + '&redirect_uri=' + redirectUri + '&affiliate_token=' + affiliateToken;
+    window.location.href = oauthUrl;
+  }
   function connectToken() {
     const token = document.getElementById('api-token-input').value.trim();
     if (!token) { alert('Please enter your API token.'); return; }
-    alert('Token received. Dashboard loading…\n\n(Connect this to your backend to complete the integration.)');
+    sessionStorage.setItem('deriv_token', token);
+    window.location.href = 'callback.html?token=' + encodeURIComponent(token);
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
