@@ -33,7 +33,7 @@ const BACKEND_URL = 'https://kingsite-backend.onrender.com';
 function showError(message) {
   document.getElementById('spinner').style.display = 'none';
   document.getElementById('status').innerHTML =
-    '<span class="error">' + message + '</span><br><a class="btn" href="/index.html">Back to Home</a>';
+    '<span class="error">' + message + '</span><br><a class="btn" href="./index.html">Back to Home</a>';
 }
 
 (async function handleCallback() {
@@ -89,7 +89,7 @@ function showError(message) {
     if (data.account) sessionStorage.setItem('deriv_account', data.account);
 
     document.getElementById('status').textContent = 'Login successful! Redirecting...';
-    window.location.href = '/index.html?token=' + encodeURIComponent(data.access_token);
+    window.location.href = './index.html?token=' + encodeURIComponent(data.access_token);
 
   } catch (err) {
     console.error('Token exchange failed:', err);
