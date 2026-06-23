@@ -12,7 +12,6 @@
       --dark: #0A0A0F;
       --dark2: #111118;
       --dark3: #1A1A24;
-      --dark4: #22222E;
       --text: #E8E8F0;
       --text-dim: #8888A0;
       --green: #00E676;
@@ -41,7 +40,7 @@
     .nav-btns { display: flex; gap: 12px; align-items: center; }
     .btn-outline { border: 1px solid var(--gold); color: var(--gold); background: transparent; padding: 8px 20px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
     .btn-outline:hover { background: var(--gold); color: var(--dark); }
-    .btn-gold { background: var(--gold); color: var(--dark); border: none; padding: 8px 20px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-gold { background: var(--gold); color: var(--dark); border: none; padding: 8px 20px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .btn-gold:hover { background: #FFC200; }
 
     /* HERO */
@@ -52,9 +51,9 @@
     .hero h1 .gold { color: var(--gold); }
     .hero p { font-size: 18px; color: var(--text-dim); max-width: 560px; line-height: 1.7; margin-bottom: 40px; }
     .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-    .btn-hero-primary { background: var(--gold); color: var(--dark); border: none; padding: 16px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-hero-primary { background: var(--gold); color: var(--dark); border: none; padding: 16px 32px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; font-family: 'Space Grotesk', sans-serif; }
     .btn-hero-primary:hover { background: #FFC200; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,215,0,0.3); }
-    .btn-hero-secondary { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.2); padding: 16px 32px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-hero-secondary { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.2); padding: 16px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; font-family: 'Space Grotesk', sans-serif; }
     .btn-hero-secondary:hover { border-color: var(--gold); color: var(--gold); }
 
     /* MODAL */
@@ -84,7 +83,6 @@
     .section-title { font-size: clamp(28px, 4vw, 48px); font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
     .section-subtitle { color: var(--text-dim); font-size: 16px; max-width: 520px; line-height: 1.7; margin-bottom: 60px; }
 
-    /* FEATURES */
     #features { background: var(--dark2); }
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
     .feature-card { background: var(--dark3); border: 1px solid var(--border); border-radius: 12px; padding: 28px; transition: all 0.3s; }
@@ -93,7 +91,6 @@
     .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
     .feature-card p { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
 
-    /* BOTS */
     #bots { background: var(--dark); }
     .bots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
     .bot-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; transition: all 0.3s; position: relative; overflow: hidden; }
@@ -115,21 +112,18 @@
     .bot-market { font-size: 12px; color: var(--text-dim); }
     .bot-market span { color: var(--gold); font-family: 'Space Mono', monospace; }
 
-    /* HOW IT WORKS */
     #how-it-works { background: var(--dark2); }
-    .steps { display: flex; gap: 0; max-width: 900px; margin: 0 auto; flex-wrap: wrap; }
+    .steps { display: flex; max-width: 900px; margin: 0 auto; flex-wrap: wrap; }
     .step { flex: 1; min-width: 220px; padding: 32px 24px; text-align: center; }
     .step-num { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--gold); margin: 0 auto 20px; background: var(--dark); }
     .step h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
     .step p { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
 
-    /* CTA */
     .cta-section { background: var(--dark); padding: 100px 48px; text-align: center; border-top: 1px solid var(--border); }
     .cta-section h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 700; margin-bottom: 16px; }
     .cta-section p { color: var(--text-dim); font-size: 16px; margin-bottom: 40px; }
     .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
-    /* FOOTER */
     footer { background: var(--dark2); border-top: 1px solid var(--border); padding: 24px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .footer-logo { font-family: 'Space Mono', monospace; font-size: 16px; color: var(--gold); letter-spacing: 2px; }
     footer p { color: var(--text-dim); font-size: 13px; }
@@ -154,7 +148,6 @@
     .bot-run-btns { display: flex; gap: 12px; }
     .btn-run { padding: 12px 28px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
     .btn-run-start { background: var(--green); color: var(--dark); }
-    .btn-run-start:hover { background: #00C853; }
     .btn-run-stop { background: transparent; border: 1px solid #FF4444 !important; color: #FF6B6B; }
     .trade-log { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
     .trade-log h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
@@ -241,42 +234,12 @@
       <div class="section-title">Battle-tested strategies, automated</div>
       <div class="section-subtitle">Six proven strategies ready to deploy on your Deriv account.</div>
       <div class="bots-grid">
-        <div class="bot-card">
-          <div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
-          <h3>Martingale Pro</h3><p>Classic Martingale with smart doubling on losses. Configurable max steps and base stake.</p>
-          <div class="bot-stats"><div class="bot-stat"><div class="stat-val">+68%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Rise/Fall</div><div class="stat-label">Type</div></div></div>
-          <div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div>
-        </div>
-        <div class="bot-card">
-          <div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div>
-          <h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale.</p>
-          <div class="bot-stats"><div class="bot-stat"><div class="stat-val">+72%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div>
-          <div class="bot-market">Market: <span>R_10 / R_25</span></div>
-        </div>
-        <div class="bot-card">
-          <div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Safe</span></div>
-          <h3>Accumulator</h3><p>Steady accumulation with configurable growth rates. Minimal risk with consistent compounding.</p>
-          <div class="bot-stats"><div class="bot-stat"><div class="stat-val">+81%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Accum.</div><div class="stat-label">Type</div></div></div>
-          <div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div>
-        </div>
-        <div class="bot-card">
-          <div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
-          <h3>Boom/Crash</h3><p>Specialized for Boom/Crash indices. Catches spike opportunities with auto entry/exit logic.</p>
-          <div class="bot-stats"><div class="bot-stat"><div class="stat-val">+59%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Spikes</div><div class="stat-label">Type</div></div></div>
-          <div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div>
-        </div>
-        <div class="bot-card">
-          <div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div>
-          <h3>Even/Odd Digit</h3><p>Analyzes tick patterns to predict Even or Odd last digit with streak detection.</p>
-          <div class="bot-stats"><div class="bot-stat"><div class="stat-val">+65%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div>
-          <div class="bot-market">Market: <span>R_10 / R_25</span></div>
-        </div>
-        <div class="bot-card">
-          <div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Safe</span></div>
-          <h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p>
-          <div class="bot-stats"><div class="bot-stat"><div class="stat-val">+77%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div>
-          <div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div>
-        </div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with smart doubling on losses. Configurable max steps and base stake.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+68%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Rise/Fall</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+72%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Safe</span></div><h3>Accumulator</h3><p>Steady accumulation with configurable growth rates. Minimal risk with consistent compounding.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+81%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Accum.</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><p>Specialized for Boom/Crash indices. Catches spike opportunities with auto entry/exit logic.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+59%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Spikes</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><p>Analyzes tick patterns to predict Even or Odd last digit with streak detection.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+65%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Safe</span></div><h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+77%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
       </div>
     </div>
   </section>
@@ -324,38 +287,12 @@
     <div class="bot-controls">
       <h3>⚙️ Bot Configuration</h3>
       <div class="controls-grid">
-        <div class="control-group"><label>Bot Strategy</label>
-          <select id="bot-select">
-            <option value="martingale">🤖 Martingale Pro</option>
-            <option value="dalembert">📈 D'Alembert</option>
-            <option value="accumulator">🔁 Accumulator</option>
-            <option value="boomcrash">💥 Boom/Crash</option>
-            <option value="evenodd">🎯 Even/Odd Digit</option>
-            <option value="overunder">🔬 Over/Under</option>
-          </select>
-        </div>
-        <div class="control-group"><label>Market</label>
-          <select id="market-select">
-            <option value="R_10">Volatility 10 (R_10)</option>
-            <option value="R_25">Volatility 25 (R_25)</option>
-            <option value="R_50">Volatility 50 (R_50)</option>
-            <option value="R_75">Volatility 75 (R_75)</option>
-            <option value="R_100">Volatility 100 (R_100)</option>
-            <option value="BOOM500">Boom 500</option>
-            <option value="CRASH500">Crash 500</option>
-          </select>
-        </div>
+        <div class="control-group"><label>Bot Strategy</label><select id="bot-select"><option value="martingale">🤖 Martingale Pro</option><option value="dalembert">📈 D'Alembert</option><option value="accumulator">🔁 Accumulator</option><option value="boomcrash">💥 Boom/Crash</option><option value="evenodd">🎯 Even/Odd Digit</option><option value="overunder">🔬 Over/Under</option></select></div>
+        <div class="control-group"><label>Market</label><select id="market-select"><option value="R_10">Volatility 10 (R_10)</option><option value="R_25">Volatility 25 (R_25)</option><option value="R_50">Volatility 50 (R_50)</option><option value="R_75">Volatility 75 (R_75)</option><option value="R_100">Volatility 100 (R_100)</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
         <div class="control-group"><label>Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" /></div>
         <div class="control-group"><label>Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" /></div>
         <div class="control-group"><label>Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" /></div>
-        <div class="control-group"><label>Duration</label>
-          <select id="duration">
-            <option value="1t">1 Tick</option>
-            <option value="5t">5 Ticks</option>
-            <option value="10t">10 Ticks</option>
-            <option value="1m">1 Minute</option>
-          </select>
-        </div>
+        <div class="control-group"><label>Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
       </div>
       <div class="bot-run-btns">
         <button class="btn-run btn-run-start" onclick="startBot()">▶ Run Bot</button>
@@ -381,8 +318,7 @@
     </div>
     <div class="tab-panel active" id="tab-oauth">
       <div class="oauth-info">You'll be redirected to Deriv to authorize. We never see your password or store your credentials.</div>
-      <!-- LEGACY OAUTH — returns tokens directly in URL, no backend needed -->
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=33AHd8gjUgryjgdaOal68&l=EN&brand=deriv" class="btn-full btn-full-gold">🔐 Login with Deriv</a>
+      <button class="btn-full btn-full-gold" onclick="loginWithDeriv()">🔐 Login with Deriv</button>
     </div>
     <div class="tab-panel" id="tab-token">
       <input class="token-input" type="text" id="token-input" placeholder="a1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
@@ -394,42 +330,46 @@
 
 <script>
   const APP_ID = '33AHd8gjUgryjgdaOal68';
-  let socket = null;
-  let botRunning = false;
-  let currentToken = null;
-  let balance = 0;
-  let totalProfit = 0;
-  let baseStake = 1;
-  let currentStake = 1;
+  const REDIRECT_URI = 'https://dp2pusa-commits.github.io/kingsite/callback.html';
+  const AUTH_URL = 'https://auth.deriv.com/oauth2/authorize';
+  let socket = null, botRunning = false, currentToken = null;
+  let balance = 0, totalProfit = 0, baseStake = 1, currentStake = 1;
 
-  // ── OAUTH CALLBACK CHECK ──
-  // Legacy oauth.deriv.com returns tokens directly in the URL query string
-  function checkOAuthCallback() {
+  // ── PKCE HELPERS ──
+  function generateRandom(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    return Array.from(crypto.getRandomValues(new Uint8Array(length))).map(b => chars[b % chars.length]).join('');
+  }
+  async function generateChallenge(verifier) {
+    const data = new TextEncoder().encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+
+  // ── OAUTH LOGIN ──
+  async function loginWithDeriv() {
+    const verifier = generateRandom(64);
+    const challenge = await generateChallenge(verifier);
+    const state = generateRandom(16);
+    sessionStorage.setItem('oauth_code_verifier', verifier);
+    sessionStorage.setItem('oauth_state', state);
+    const url = `${AUTH_URL}?response_type=code&client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=read+trade&state=${state}&code_challenge=${challenge}&code_challenge_method=S256`;
+    window.location.href = url;
+  }
+
+  // ── CHECK FOR TOKEN ON LOAD ──
+  function checkToken() {
     const params = new URLSearchParams(window.location.search);
-    const token1 = params.get('token1');
-    const acct1 = params.get('acct1');
-    if (token1) {
-      // Clean URL
+    const token = params.get('token');
+    if (token) {
       window.history.replaceState({}, document.title, window.location.pathname);
-      sessionStorage.setItem('deriv_token', token1);
-      sessionStorage.setItem('deriv_account', acct1 || '');
-      initDashboard(token1, acct1);
+      sessionStorage.setItem('deriv_token', token);
+      initDashboard(token);
       return;
     }
-    // Check saved session
     const saved = sessionStorage.getItem('deriv_token');
-    if (saved) initDashboard(saved, sessionStorage.getItem('deriv_account'));
+    if (saved) initDashboard(saved);
   }
-
-  // ── MODAL ──
-  function openModal() { document.getElementById('modal').classList.add('active'); }
-  function closeModal() { document.getElementById('modal').classList.remove('active'); }
-  function switchTab(tab) {
-    document.querySelectorAll('.login-tab').forEach((t, i) => t.classList.toggle('active', (i===0&&tab==='oauth')||(i===1&&tab==='token')));
-    document.getElementById('tab-oauth').classList.toggle('active', tab === 'oauth');
-    document.getElementById('tab-token').classList.toggle('active', tab === 'token');
-  }
-  document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
 
   // ── TOKEN LOGIN ──
   function connectToken() {
@@ -437,15 +377,24 @@
     if (!token || !token.startsWith('a1-')) { alert('Please enter a valid Deriv API token (starts with a1-)'); return; }
     sessionStorage.setItem('deriv_token', token);
     closeModal();
-    initDashboard(token, null);
+    initDashboard(token);
   }
 
+  // ── MODAL ──
+  function openModal() { document.getElementById('modal').classList.add('active'); }
+  function closeModal() { document.getElementById('modal').classList.remove('active'); }
+  function switchTab(tab) {
+    document.querySelectorAll('.login-tab').forEach((t, i) => t.classList.toggle('active', (i===0&&tab==='oauth')||(i===1&&tab==='token')));
+    document.getElementById('tab-oauth').classList.toggle('active', tab==='oauth');
+    document.getElementById('tab-token').classList.toggle('active', tab==='token');
+  }
+  document.getElementById('modal').addEventListener('click', e => { if (e.target===document.getElementById('modal')) closeModal(); });
+
   // ── INIT DASHBOARD ──
-  function initDashboard(token, account) {
+  function initDashboard(token) {
     currentToken = token;
     document.getElementById('landing').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    if (account) document.getElementById('dash-account').textContent = account.toUpperCase();
     connectWebSocket(token);
   }
 
@@ -460,22 +409,18 @@
         balance = data.authorize.balance;
         document.getElementById('dash-balance').textContent = data.authorize.currency + ' ' + parseFloat(balance).toFixed(2);
         document.getElementById('dash-account').textContent = data.authorize.loginid;
-        sessionStorage.setItem('deriv_account', data.authorize.loginid);
-        // Subscribe to live ticks for ticker
-        ['R_10','R_25','R_50','R_75','R_100','BOOM500','CRASH500'].forEach(sym => {
-          socket.send(JSON.stringify({ ticks: sym, subscribe: 1 }));
-        });
+        ['R_10','R_25','R_50','R_75','R_100','BOOM500','CRASH500'].forEach(sym => socket.send(JSON.stringify({ ticks: sym, subscribe: 1 })));
       }
       if (data.msg_type === 'tick') updateTicker(data.tick);
       if (data.msg_type === 'buy') handleBuy(data);
       if (data.msg_type === 'proposal_open_contract') handleContract(data);
     };
-    socket.onerror = () => alert('Connection error. Please check your token and try again.');
+    socket.onerror = () => alert('Connection error. Please try again.');
     socket.onclose = () => { if (botRunning) { botRunning = false; addLog('⚠️ Connection lost', '', ''); } };
   }
 
   // ── TICKER ──
-  const tickerMap = { 'R_10': 't-r10', 'R_25': 't-r25', 'R_50': 't-r50', 'R_75': 't-r75', 'R_100': 't-r100', 'BOOM500': 't-boom', 'CRASH500': 't-crash' };
+  const tickerMap = { 'R_10':'t-r10','R_25':'t-r25','R_50':'t-r50','R_75':'t-r75','R_100':'t-r100','BOOM500':'t-boom','CRASH500':'t-crash' };
   let lastPrices = {};
   function updateTicker(tick) {
     const el = document.getElementById(tickerMap[tick.symbol]);
@@ -483,7 +428,7 @@
     const price = parseFloat(tick.quote).toFixed(2);
     const last = lastPrices[tick.symbol];
     const dir = last ? (price > last ? '▲' : price < last ? '▼' : '—') : '▲';
-    el.className = dir === '▲' ? 'up' : dir === '▼' ? 'down' : '';
+    el.className = dir === '▲' ? 'up' : 'down';
     el.textContent = price + ' ' + dir;
     lastPrices[tick.symbol] = price;
   }
@@ -499,39 +444,25 @@
     addLog('🟢 Bot started', '', '');
     placeTrade();
   }
-
   function stopBot() {
     botRunning = false;
-    addLog('🔴 Bot stopped | Total P&L: ' + (totalProfit >= 0 ? '+' : '') + totalProfit.toFixed(2), '', '');
+    addLog('🔴 Bot stopped | P&L: ' + (totalProfit >= 0 ? '+' : '') + totalProfit.toFixed(2), '', '');
   }
-
   function placeTrade() {
     if (!botRunning || !socket) return;
     const bot = document.getElementById('bot-select').value;
     const market = document.getElementById('market-select').value;
     const dur = document.getElementById('duration').value;
-    const durUnit = dur.replace(/[0-9]/g, '');
-    const durVal = parseInt(dur);
     let contractType = 'CALL';
     if (bot === 'evenodd') contractType = Math.random() > 0.5 ? 'DIGITEVEN' : 'DIGITODD';
     else if (bot === 'overunder') contractType = Math.random() > 0.5 ? 'DIGITOVER' : 'DIGITUNDER';
     else contractType = Math.random() > 0.5 ? 'CALL' : 'PUT';
-
-    socket.send(JSON.stringify({
-      buy: 1, subscribe: 1, price: currentStake,
-      parameters: {
-        amount: currentStake, basis: 'stake',
-        contract_type: contractType, currency: 'USD',
-        duration: durVal, duration_unit: durUnit, symbol: market
-      }
-    }));
+    socket.send(JSON.stringify({ buy: 1, subscribe: 1, price: currentStake, parameters: { amount: currentStake, basis: 'stake', contract_type: contractType, currency: 'USD', duration: parseInt(dur), duration_unit: dur.replace(/[0-9]/g,''), symbol: market } }));
   }
-
   function handleBuy(data) {
     if (data.error) { addLog('❌ Error: ' + data.error.message, '', ''); return; }
     if (data.buy) addLog('📤 Trade placed', data.buy.contract_id || '', '$' + currentStake.toFixed(2));
   }
-
   function handleContract(data) {
     const c = data.proposal_open_contract;
     if (!c || !c.is_sold) return;
@@ -540,20 +471,15 @@
     balance += profit;
     document.getElementById('dash-balance').textContent = 'USD ' + balance.toFixed(2);
     addLog(profit >= 0 ? '✅ Win' : '❌ Loss', c.contract_id || '', (profit >= 0 ? '+' : '') + profit.toFixed(2));
-
     const tp = parseFloat(document.getElementById('take-profit').value);
     const sl = parseFloat(document.getElementById('stop-loss').value);
     if (totalProfit >= tp) { stopBot(); addLog('🏆 Take profit hit!', '', '+' + totalProfit.toFixed(2)); return; }
     if (totalProfit <= -sl) { stopBot(); addLog('🛑 Stop loss hit!', '', totalProfit.toFixed(2)); return; }
-
-    // Strategy stake adjustment
     const bot = document.getElementById('bot-select').value;
     if (bot === 'martingale') currentStake = profit < 0 ? currentStake * 2 : baseStake;
     else if (bot === 'dalembert') currentStake = profit < 0 ? currentStake + baseStake : Math.max(baseStake, currentStake - baseStake);
-
     if (botRunning) setTimeout(placeTrade, 1500);
   }
-
   function addLog(action, id, amount) {
     const c = document.getElementById('log-entries');
     const empty = c.querySelector('.log-empty');
@@ -564,7 +490,6 @@
     e.innerHTML = `<span>${action}</span><span style="color:var(--text-dim);font-size:12px;font-family:'Space Mono',monospace">${id}</span><span class="${cls}">${amount}</span>`;
     c.insertBefore(e, c.firstChild);
   }
-
   function logout() {
     sessionStorage.clear();
     botRunning = false;
@@ -574,7 +499,7 @@
     document.getElementById('log-entries').innerHTML = '<div class="log-empty">No trades yet. Configure and run a bot to start.</div>';
   }
 
-  checkOAuthCallback();
+  checkToken();
 </script>
 </body>
 </html>
