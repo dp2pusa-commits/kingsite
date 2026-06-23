@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Connecting... | Grimm Trading Hub</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --border: rgba(255,255,255,0.08);
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --text: #f0eeff;
+    --muted: #8b8ba8;
+    --green: #10b981;
+    --red: #ef4444;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 420px;
+    max-width: 95vw;
+    text-align: center;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    margin-bottom: 36px;
+  }
+  .logo-hex {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+  }
+  .logo-underscore { color: var(--accent2); }
+
+  /* Spinner */
+  .spinner-wrap { margin-bottom: 28px; }
+  .spinner {
+    width: 52px; height: 52px;
+    border: 3px solid rgba(124,58,237,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Success icon */
+  .success-icon {
+    width: 52px; height: 52px;
+    background: rgba(16,185,129,0.15);
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 22px;
+  }
+
+  /* Error icon */
+  .error-icon {
+    width: 52px; height: 52px;
+    background: rgba(239,68,68,0.15);
+    border: 2px solid var(--red);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 22px;
+  }
+
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  .account-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 4px 0;
+  }
+  .pill-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .progress-bar-wrap {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-top: 28px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    width: 0%;
+    transition: width .4s ease;
+  }
+
+  .redirect-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    opacity: 0;
+    transition: opacity .4s;
+  }
+
+  .btn-retry {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s;
+  }
+  .btn-retry:hover { background: #6d28d9; }
+</style>
+</head>
+<body>
+<div class="box" id="box">
+
+  <div class="logo">
+    <div class="logo-hex">⬡</div>
+    GRIMM<span class="logo-underscore">_</span>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div id="state-loading">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+    <h2>Connecting your account…</h2>
+    <p>Securely retrieving your Deriv session. This only takes a moment.</p>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress"></div></div>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div id="state-success" style="display:none;">
+    <div class="success-icon" id="success-icon" style="display:flex;">✓</div>
+    <h2>Account connected!</h2>
+    <p>Welcome back. Your Deriv account is now linked.</p>
+    <div id="accounts-list"></div>
+    <div class="redirect-note" id="redirect-note">Redirecting to dashboard…</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress2" style="background:var(--green);"></div></div>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div id="state-error" style="display:none;">
+    <div class="error-icon" id="error-icon" style="display:flex;">✕</div>
+    <h2>Connection failed</h2>
+    <p id="error-msg">No account token was received from Deriv. Please try again.</p>
+    <a href="index.html" class="btn-retry">← Try Again</a>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+
+  // Collect all accounts Deriv returns (acct1/token1, acct2/token2 …)
+  const accounts = [];
+  let i = 1;
+  while (params.get('acct' + i)) {
+    accounts.push({
+      account: params.get('acct' + i),
+      token:   params.get('token' + i),
+      currency: params.get('cur' + i) || ''
+    });
+    i++;
+  }
+
+  const bar = document.getElementById('progress');
+
+  // Animate loading bar
+  let w = 0;
+  const fill = setInterval(() => {
+    w = Math.min(w + Math.random() * 18, 85);
+    bar.style.width = w + '%';
+  }, 200);
+
+  setTimeout(() => {
+    clearInterval(fill);
+    bar.style.width = '100%';
+
+    setTimeout(() => {
+      if (accounts.length === 0) {
+        showError('No account token was received from Deriv. Please try again.');
+        return;
+      }
+
+      // Save to sessionStorage
+      sessionStorage.setItem('deriv_accounts', JSON.stringify(accounts));
+      sessionStorage.setItem('deriv_token', accounts[0].token);
+      sessionStorage.setItem('deriv_account', accounts[0].account);
+
+      showSuccess(accounts);
+    }, 300);
+  }, 1800);
+
+  function showSuccess(accounts) {
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('state-success').style.display = 'block';
+
+    // Show account pills
+    const list = document.getElementById('accounts-list');
+    accounts.forEach(a => {
+      const pill = document.createElement('span');
+      pill.className = 'account-pill';
+      pill.innerHTML = '<span class="pill-dot"></span>' + a.account + (a.currency ? ' · ' + a.currency : '');
+      list.appendChild(pill);
+    });
+
+    // Animate redirect bar
+    const bar2 = document.getElementById('progress2');
+    const note = document.getElementById('redirect-note');
+    setTimeout(() => { note.style.opacity = '1'; }, 300);
+    let p = 0;
+    const go = setInterval(() => {
+      p += 2;
+      bar2.style.width = p + '%';
+      if (p >= 100) {
+        clearInterval(go);
+        // Redirect to dashboard (index.html) after bar completes
+        window.location.href = 'index.html?login=success';
+      }
+    }, 40);
+  }
+
+  function showError(msg) {
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('state-error').style.display = 'block';
+    document.getElementById('error-msg').textContent = msg;
+  }
+})();
+</script>
+</body>
+</html>
