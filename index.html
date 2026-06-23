@@ -353,7 +353,7 @@
     const state = generateRandom(16);
     sessionStorage.setItem('oauth_code_verifier', verifier);
     sessionStorage.setItem('oauth_state', state);
-    const url = `${AUTH_URL}?response_type=code&client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=read+trade&state=${state}&code_challenge=${challenge}&code_challenge_method=S256`;
+    const url = `${AUTH_URL}?response_type=code&client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage&state=${state}&code_challenge=${challenge}&code_challenge_method=S256`;
     window.location.href = url;
   }
 
