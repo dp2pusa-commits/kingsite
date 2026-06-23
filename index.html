@@ -332,8 +332,11 @@
   const APP_ID = '33Dg2mvJU7l5aIjukYAvN';
   const REDIRECT_URI = 'https://dp2pusa-commits.github.io/kingsite/callback.html';
   const AUTH_URL = 'https://auth.deriv.com/oauth2/auth';
-  let socket = null, botRunning = false, currentToken = null;
+  const API_BASE = 'https://api.derivws.com';
+  let socket = null, botRunning = false, currentToken = null, currentAccountId = null;
   let balance = 0, totalProfit = 0, baseStake = 1, currentStake = 1;
+  let reqIdCounter = 1;
+  const pendingProposals = {}; // req_id -> info needed once proposal comes back
 
   // ── PKCE HELPERS ──
   function generateRandom(length) {
@@ -371,10 +374,10 @@
     if (saved) initDashboard(saved);
   }
 
-  // ── TOKEN LOGIN ──
+  // ── TOKEN LOGIN (legacy PAT tokens, e.g. a1-xxxx, still used by the manual tab) ──
   function connectToken() {
     const token = document.getElementById('token-input').value.trim();
-    if (!token || !token.startsWith('a1-')) { alert('Please enter a valid Deriv API token (starts with a1-)'); return; }
+    if (!token) { alert('Please enter a valid Deriv API token'); return; }
     sessionStorage.setItem('deriv_token', token);
     closeModal();
     initDashboard(token);
@@ -391,36 +394,88 @@
   document.getElementById('modal').addEventListener('click', e => { if (e.target===document.getElementById('modal')) closeModal(); });
 
   // ── INIT DASHBOARD ──
-  function initDashboard(token) {
+  async function initDashboard(token) {
     currentToken = token;
     document.getElementById('landing').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    connectWebSocket(token);
+    await connectViaOtp(token);
   }
 
-  // ── WEBSOCKET ──
-  function connectWebSocket(token) {
-    socket = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=' + APP_ID);
-    socket.onopen = () => socket.send(JSON.stringify({ authorize: token }));
+  // ── NEW API: fetch accounts, then OTP, then connect WebSocket ──
+  async function connectViaOtp(token) {
+    try {
+      const accountsRes = await fetch(API_BASE + '/trading/v1/options/accounts', {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Deriv-App-ID': APP_ID
+        }
+      });
+      const accountsData = await accountsRes.json();
+
+      if (!accountsRes.ok || !accountsData.data || !accountsData.data.length) {
+        throw new Error(accountsData.errors ? accountsData.errors[0].message : 'No trading accounts found');
+      }
+
+      const account = accountsData.data[0];
+      currentAccountId = account.id || account.account_id || account.loginid;
+
+      document.getElementById('dash-account').textContent = currentAccountId;
+      balance = parseFloat(account.balance || 0);
+      document.getElementById('dash-balance').textContent = (account.currency || 'USD') + ' ' + balance.toFixed(2);
+
+      const otpRes = await fetch(API_BASE + '/trading/v1/options/accounts/' + currentAccountId + '/otp', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Deriv-App-ID': APP_ID
+        }
+      });
+      const otpData = await otpRes.json();
+
+      if (!otpRes.ok || !otpData.data || !otpData.data.url) {
+        throw new Error(otpData.errors ? otpData.errors[0].message : 'Failed to get WebSocket OTP URL');
+      }
+
+      connectWebSocket(otpData.data.url);
+
+    } catch (err) {
+      console.error('Account/OTP setup failed:', err);
+      alert('Could not connect to your Deriv account: ' + err.message);
+    }
+  }
+
+  // ── WEBSOCKET (new API: URL is pre-authenticated via OTP) ──
+  function connectWebSocket(wsUrl) {
+    socket = new WebSocket(wsUrl);
+    socket.onopen = () => {
+      send({ balance: 1, subscribe: 1 });
+      ['1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V','BOOM500','CRASH500'].forEach(sym => send({ ticks: sym, subscribe: 1 }));
+    };
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
-      if (data.msg_type === 'authorize') {
-        if (data.error) { alert('Authorization failed: ' + data.error.message); logout(); return; }
-        balance = data.authorize.balance;
-        document.getElementById('dash-balance').textContent = data.authorize.currency + ' ' + parseFloat(balance).toFixed(2);
-        document.getElementById('dash-account').textContent = data.authorize.loginid;
-        ['R_10','R_25','R_50','R_75','R_100','BOOM500','CRASH500'].forEach(sym => socket.send(JSON.stringify({ ticks: sym, subscribe: 1 })));
+      if (data.msg_type === 'balance' && data.balance) {
+        balance = parseFloat(data.balance.balance);
+        document.getElementById('dash-balance').textContent = (data.balance.currency || 'USD') + ' ' + balance.toFixed(2);
       }
       if (data.msg_type === 'tick') updateTicker(data.tick);
+      if (data.msg_type === 'proposal') handleProposal(data);
       if (data.msg_type === 'buy') handleBuy(data);
       if (data.msg_type === 'proposal_open_contract') handleContract(data);
+      if (data.error) addLog('❌ Error: ' + data.error.message, '', '');
     };
     socket.onerror = () => alert('Connection error. Please try again.');
     socket.onclose = () => { if (botRunning) { botRunning = false; addLog('⚠️ Connection lost', '', ''); } };
   }
 
-  // ── TICKER ──
-  const tickerMap = { 'R_10':'t-r10','R_25':'t-r25','R_50':'t-r50','R_75':'t-r75','R_100':'t-r100','BOOM500':'t-boom','CRASH500':'t-crash' };
+  function send(obj) {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+    obj.req_id = reqIdCounter++;
+    socket.send(JSON.stringify(obj));
+    return obj.req_id;
+  }
+
+  // ── TICKER (new API symbol names) ──
+  const tickerMap = { '1HZ10V':'t-r10','1HZ25V':'t-r25','1HZ50V':'t-r50','1HZ75V':'t-r75','1HZ100V':'t-r100','BOOM500':'t-boom','CRASH500':'t-crash' };
   let lastPrices = {};
   function updateTicker(tick) {
     const el = document.getElementById(tickerMap[tick.symbol]);
@@ -432,6 +487,9 @@
     el.textContent = price + ' ' + dir;
     lastPrices[tick.symbol] = price;
   }
+
+  // ── MARKET SELECT MAPPING (UI keeps old labels, maps to new symbol names) ──
+  const marketSymbolMap = { 'R_10':'1HZ10V','R_25':'1HZ25V','R_50':'1HZ50V','R_75':'1HZ75V','R_100':'1HZ100V','BOOM500':'BOOM500','CRASH500':'CRASH500' };
 
   // ── BOT ──
   function startBot() {
@@ -451,17 +509,37 @@
   function placeTrade() {
     if (!botRunning || !socket) return;
     const bot = document.getElementById('bot-select').value;
-    const market = document.getElementById('market-select').value;
+    const marketUi = document.getElementById('market-select').value;
+    const symbol = marketSymbolMap[marketUi] || marketUi;
     const dur = document.getElementById('duration').value;
-    let contractType = 'CALL';
+    let contractType = Math.random() > 0.5 ? 'MULTUP' : 'MULTDOWN';
     if (bot === 'evenodd') contractType = Math.random() > 0.5 ? 'DIGITEVEN' : 'DIGITODD';
     else if (bot === 'overunder') contractType = Math.random() > 0.5 ? 'DIGITOVER' : 'DIGITUNDER';
-    else contractType = Math.random() > 0.5 ? 'CALL' : 'PUT';
-    socket.send(JSON.stringify({ buy: 1, subscribe: 1, price: currentStake, parameters: { amount: currentStake, basis: 'stake', contract_type: contractType, currency: 'USD', duration: parseInt(dur), duration_unit: dur.replace(/[0-9]/g,''), symbol: market } }));
+
+    const reqId = send({
+      proposal: 1,
+      amount: currentStake,
+      basis: 'stake',
+      contract_type: contractType,
+      currency: 'USD',
+      duration: parseInt(dur),
+      duration_unit: dur.replace(/[0-9]/g, ''),
+      symbol: symbol
+    });
+    pendingProposals[reqId] = { contractType, symbol };
+  }
+  function handleProposal(data) {
+    const info = pendingProposals[data.req_id];
+    delete pendingProposals[data.req_id];
+    if (data.error || !data.proposal) { addLog('❌ Proposal failed: ' + (data.error ? data.error.message : 'unknown'), '', ''); return; }
+    send({ buy: data.proposal.id, price: currentStake });
   }
   function handleBuy(data) {
     if (data.error) { addLog('❌ Error: ' + data.error.message, '', ''); return; }
-    if (data.buy) addLog('📤 Trade placed', data.buy.contract_id || '', '$' + currentStake.toFixed(2));
+    if (data.buy) {
+      addLog('📤 Trade placed', data.buy.contract_id || '', '$' + currentStake.toFixed(2));
+      send({ proposal_open_contract: 1, contract_id: data.buy.contract_id, subscribe: 1 });
+    }
   }
   function handleContract(data) {
     const c = data.proposal_open_contract;
