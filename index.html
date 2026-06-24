@@ -281,6 +281,10 @@
 
       /* Mobile bottom nav */
       .mobile-bottom-nav { display: block; }
+      /* Avoid showing both "Logout" (top nav) and "Exit" (bottom nav) at
+         once on mobile — Exit in the bottom tab bar is the single logout
+         action here; the top nav keeps account info + Switch only. */
+      #topnav-logout { display: none; }
 
       /* FAQ */
       .faq-question { font-size: 14px; padding: 14px 16px; }
@@ -473,7 +477,7 @@
       <div class="account-badge" id="dash-account">—</div>
       <div class="balance-badge" id="dash-balance">$ —</div>
       <button class="btn-switch" onclick="showAccountPicker(allAccounts)" title="Switch account">⇄ Switch</button>
-      <button class="btn-logout" onclick="logout()">Logout</button>
+      <button class="btn-logout" id="topnav-logout" onclick="logout()">Logout</button>
     </div>
   </div>
   <div class="dashboard-content">
