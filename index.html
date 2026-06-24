@@ -104,8 +104,10 @@
     .bot-stat { flex: 1; background: var(--dark3); border-radius: 8px; padding: 10px; text-align: center; }
     .bot-stat .stat-val { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--green); }
     .bot-stat .stat-label { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-    .bot-market { font-size: 12px; color: var(--text-dim); }
+    .bot-market { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
     .bot-market span { color: var(--gold); font-family: 'Space Mono', monospace; }
+    .bot-drawdown { font-size: 12px; color: var(--text-dim); line-height: 1.6; padding-top: 12px; border-top: 1px solid var(--border); }
+    .bot-drawdown strong { color: #FF9800; }
 
     #how-it-works { background: var(--dark2); }
     .steps { display: flex; max-width: 900px; margin: 0 auto; flex-wrap: wrap; }
@@ -194,6 +196,8 @@
     .bot-info-box .info-risk.aggressive { background: rgba(255,68,68,0.15); color: #FF6B6B; }
     .bot-info-box .info-risk.moderate { background: rgba(255,215,0,0.1); color: var(--gold); }
     .bot-info-box .info-risk.safe { background: rgba(0,230,118,0.1); color: var(--green); }
+    .bot-info-box .info-drawdown { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--text-dim); }
+    .bot-info-box .info-drawdown strong { color: #FF9800; }
 
     /* QUIZ MODAL */
     .quiz-step { display: none; }
@@ -383,15 +387,15 @@
       <div class="section-title">Pre-built strategies, automated</div>
       <div class="section-subtitle">Ten strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
       <div class="bots-grid">
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with stake doubling on losses. Configurable max steps and base stake. Higher risk of large losses during long losing streaks.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale, but still carries risk of loss.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Accumulator</h3><p>Flat-stake accumulation strategy with configurable growth rate settings.</p><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><p>Configured for Boom/Crash indices, with automated entry/exit logic.</p><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><p>Predicts Even or Odd last digit with streak detection logic.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎲</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Matches/Differs</h3><p>Predicts whether the last digit will match or differ from a chosen target digit. A different digit-contract signal from Even/Odd or Over/Under.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🛡️</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Oscar's Grind</h3><p>A gentler money-management style than Martingale: stake increases by one unit only after a win, and resets once a small profit target is reached. Designed to recover slowly and cautiously rather than chase losses.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">⚖️</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Fixed-Ratio</h3><p>Stake scales with session profit — it grows only as profit builds up, and shrinks back toward your base stake as losses mount, instead of chasing losses like Martingale.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with stake doubling on losses. Configurable max steps and base stake. Higher risk of large losses during long losing streaks.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Highest here. Stake doubles per loss — 5 losses in a row costs 31× base stake cumulatively, 7 losses costs 127×. This site caps the stake at 32× base, but reaching that point is still a steep drawdown from one streak.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale, but still carries risk of loss.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Moderate. Stake rises by one unit per loss rather than doubling — slower to escalate than Martingale, but a long losing streak still adds up.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Accumulator</h3><p>Flat-stake accumulation strategy with configurable growth rate settings.</p><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Lowest of the staking styles. Flat stake means a losing streak costs (losses × stake) with no compounding at all.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><p>Configured for Boom/Crash indices, with automated entry/exit logic.</p><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Stake stays flat, but Boom/Crash spike indices can move sharply, so individual trade outcomes can be less predictable than smoother Volatility indices.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><p>Predicts Even or Odd last digit with streak detection logic.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Flat stake — losing-streak cost scales linearly with no compounding, same as Accumulator.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Flat stake — same linear, non-compounding drawdown profile as the other digit bots.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎲</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Matches/Differs</h3><p>Predicts whether the last digit will match or differ from a chosen target digit. A different digit-contract signal from Even/Odd or Over/Under.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Flat stake — same non-compounding profile. "Differs" wins more often than "Matches" on a 10-digit barrier, which affects how often a losing streak happens, not how costly each one is.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🛡️</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Oscar's Grind</h3><p>A gentler money-management style than Martingale: stake increases by one unit only after a win, and resets once a small profit target is reached. Designed to recover slowly and cautiously rather than chase losses.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Among the lowest by design. Stake never rises after a loss, so a losing streak costs exactly (losses × current stake) — no escalation at all, the opposite of Martingale.</div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">⚖️</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Fixed-Ratio</h3><p>Stake scales with session profit — it grows only as profit builds up, and shrinks back toward your base stake as losses mount, instead of chasing losses like Martingale.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Moderate-to-low. Stake can only grow after profit has already built up, and shrinks back toward base stake as losses erode that profit — gains are given back gradually rather than escalating the original bet.</div></div>
       </div>
     </div>
   </section>
@@ -671,6 +675,16 @@
   let lastValidStopLoss = 10;            // fallback if the SL field is edited into something invalid mid-run
   let grindCycleProfit = 0;              // Oscar's Grind tracks its own small target separate from overall session P&L
 
+  // ── CONNECTION RELIABILITY ──
+  let lastWsUrl = null;             // remember the OTP URL so an unexpected drop can attempt to reconnect
+  let isIntentionalClose = false;   // true for logout/explicit close, so onclose doesn't try to "recover" from it
+  let reconnectAttempts = 0;
+  const MAX_RECONNECT_ATTEMPTS = 3;
+  let reconnectTimer = null;
+
+  // ── LOG SIZE CAP ──
+  const MAX_LOG_ENTRIES = 200;      // caps DOM growth on a long unattended run
+
   // ── PKCE HELPERS ──
   function generateRandom(length) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -869,18 +883,26 @@
   }
 
   // ── WEBSOCKET ──
-  function connectWebSocket(wsUrl) {
+  function connectWebSocket(wsUrl, isReconnect) {
     // Defense in depth: always close any existing socket before opening a
-    // new one, regardless of caller. The Switch button is now blocked while
-    // the bot is running (see showAccountPicker), but this guards against
-    // any other path that might call connectWebSocket a second time without
+    // new one, regardless of caller. The Switch button is blocked while the
+    // bot is running (see showAccountPicker), but this guards against any
+    // other path that might call connectWebSocket a second time without
     // having cleaned up the previous connection.
     if (socket) {
       try { socket.onclose = null; socket.close(); } catch (e) {}
       socket = null;
     }
+    if (!isReconnect) {
+      lastWsUrl = wsUrl;
+      reconnectAttempts = 0;
+    }
+    isIntentionalClose = false;
+
     socket = new WebSocket(wsUrl);
     socket.onopen = () => {
+      reconnectAttempts = 0; // a successful open clears the retry counter
+      if (isReconnect) addLog('✅ Reconnected', '', '');
       send({ balance: 1, subscribe: 1 });
       ['1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V','BOOM500','CRASH500'].forEach(sym => send({ ticks: sym, subscribe: 1 }));
     };
@@ -896,8 +918,46 @@
       if (data.msg_type === 'proposal_open_contract') handleContract(data);
       if (data.error) addLog('❌ Error: ' + data.error.message, '', '');
     };
-    socket.onerror = () => alert('Connection error. Please try again.');
-    socket.onclose = () => { if (botRunning) { botRunning = false; addLog('⚠️ Connection lost', '', ''); } };
+    // Non-blocking: connection issues show up in the status bar and log
+    // instead of a blocking alert(), which would freeze the page and could
+    // stack up if the bot is running unattended and the connection is flaky.
+    socket.onerror = () => {
+      addLog('⚠️ Connection error', '', '');
+    };
+    socket.onclose = () => {
+      if (isIntentionalClose) return; // logout/explicit close — nothing to recover
+      const wasRunning = botRunning;
+      if (wasRunning) botRunning = false;
+      attemptReconnect(wasRunning);
+    };
+  }
+
+  function attemptReconnect(wasRunning) {
+    if (!lastWsUrl) {
+      addLog('⚠️ Connection lost', '', '');
+      return;
+    }
+    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+      setStatus('🔌 Disconnected', 'var(--red)');
+      addLog('⚠️ Connection lost — gave up after ' + MAX_RECONNECT_ATTEMPTS + ' reconnect attempts. Press Run to try again.', '', '');
+      return;
+    }
+    reconnectAttempts++;
+    const delayMs = 2000 * reconnectAttempts; // simple backoff: 2s, 4s, 6s
+    setStatus('🔌 Reconnecting (' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ')…', '#FF9800');
+    addLog('⚠️ Connection lost — reconnecting in ' + (delayMs / 1000) + 's (attempt ' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ')' + (wasRunning ? '. Bot is paused until reconnected.' : ''), '', '');
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(() => {
+      connectWebSocket(lastWsUrl, true);
+      // Note: we deliberately do NOT auto-resume botRunning/placeTrade here.
+      // A reconnect after a dropped connection mid-trade can't know whether
+      // the in-flight proposal/buy actually went through on Deriv's side —
+      // resuming blindly risks placing a duplicate trade. Surfacing
+      // "reconnected, press Run to resume" is slower but can't double-trade.
+      if (wasRunning) {
+        setStatus('⏸ Reconnected — press Run to resume', 'var(--text-dim)');
+      }
+    }, delayMs);
   }
 
   function send(obj) {
@@ -970,23 +1030,32 @@
   // the "Help me choose" quiz result — so the two never drift out of sync.
   const BOT_INFO = {
     martingale:    { risk: 'aggressive', label: 'Aggressive', icon: '🤖', name: "Martingale Pro",
-      desc: "Doubles the stake after every loss, resets to base stake after a win. Can recover a losing streak quickly, but a long streak can escalate the stake fast — that's why this site enforces a hard stake ceiling." },
+      desc: "Doubles the stake after every loss, resets to base stake after a win. Can recover a losing streak quickly, but a long streak can escalate the stake fast — that's why this site enforces a hard stake ceiling.",
+      drawdown: "Highest drawdown risk here. Stake doubles every loss, so cumulative cost compounds fast: 5 losses in a row costs 31× your base stake total, 7 losses costs 127×. The stake ceiling on this site stops it at 32× base, but even reaching that point means a steep drawdown from one losing streak." },
     dalembert:     { risk: 'moderate', label: 'Moderate', icon: '📈', name: "D'Alembert",
-      desc: "Increases stake by one unit on a loss, decreases by one unit on a win. Milder than Martingale, but stake still grows during a losing streak." },
+      desc: "Increases stake by one unit on a loss, decreases by one unit on a win. Milder than Martingale, but stake still grows during a losing streak.",
+      drawdown: "Moderate drawdown risk. Stake grows by one base-stake unit per loss instead of doubling, so a losing streak costs roughly stake×(1+2+3+...) — slower to escalate than Martingale, but it still adds up the longer a streak runs." },
     accumulator:   { risk: 'safe', label: 'Lower-variance', icon: '🔁', name: "Accumulator",
-      desc: "Keeps the stake flat regardless of recent results. The simplest, most predictable option — no stake escalation in either direction." },
+      desc: "Keeps the stake flat regardless of recent results. The simplest, most predictable option — no stake escalation in either direction.",
+      drawdown: "Lowest drawdown risk of the staking styles. Every trade costs the same fixed amount, so a losing streak's cost is just (number of losses × base stake) — no compounding, no escalation." },
     boomcrash:     { risk: 'aggressive', label: 'Aggressive', icon: '💥', name: "Boom/Crash",
-      desc: "Configured for the Boom/Crash spike indices specifically, rather than the smoother Volatility indices. Spike-based markets can move sharply." },
+      desc: "Configured for the Boom/Crash spike indices specifically, rather than the smoother Volatility indices. Spike-based markets can move sharply.",
+      drawdown: "Drawdown risk here comes from market behavior, not stake scaling — the stake itself stays flat, but Boom/Crash indices can move sharply around spikes, so individual trade outcomes can be less predictable than smoother Volatility indices." },
     evenodd:       { risk: 'moderate', label: 'Moderate', icon: '🎯', name: "Even/Odd Digit",
-      desc: "Predicts whether the next digit will be even or odd. Flat stake by default — pick a money-management bot separately if you want stake scaling." },
+      desc: "Predicts whether the next digit will be even or odd. Flat stake by default — pick a money-management bot separately if you want stake scaling.",
+      drawdown: "Flat stake, so drawdown from a losing streak is just (number of losses × base stake) with no compounding — the same as Accumulator. Risk here is about the prediction itself, not stake escalation." },
     overunder:     { risk: 'safe', label: 'Lower-variance', icon: '🔬', name: "Over/Under",
-      desc: "Predicts whether the next digit will fall over or under a barrier. Flat stake, digit-contract style." },
+      desc: "Predicts whether the next digit will fall over or under a barrier. Flat stake, digit-contract style.",
+      drawdown: "Flat stake — drawdown from a losing streak scales linearly (no compounding), same as the other flat-stake digit bots." },
     matchesdiffers:{ risk: 'moderate', label: 'Moderate', icon: '🎲', name: "Matches/Differs",
-      desc: "Predicts whether the next digit will match or differ from a randomly chosen target digit each trade. A different digit signal from Even/Odd or Over/Under." },
+      desc: "Predicts whether the next digit will match or differ from a randomly chosen target digit each trade. A different digit signal from Even/Odd or Over/Under.",
+      drawdown: "Flat stake — same linear, non-compounding drawdown profile as the other digit bots. The 'Differs' side has higher odds of winning than 'Matches' on a 10-digit barrier, which affects how often a losing streak happens, not how costly each one is." },
     oscarsgrind:   { risk: 'safe', label: 'Lower-variance', icon: '🛡️', name: "Oscar's Grind",
-      desc: "A cautious money-management style: stake only ever increases after a win (never after a loss), by one unit at a time, resetting once a small profit target is hit. Designed to avoid chasing losses." },
+      desc: "A cautious money-management style: stake only ever increases after a win (never after a loss), by one unit at a time, resetting once a small profit target is hit. Designed to avoid chasing losses.",
+      drawdown: "Among the lowest drawdown risk here by design. Because stake never increases after a loss, a losing streak costs exactly (number of losses × current stake) with no escalation at all — the opposite risk shape from Martingale." },
     fixedratio:    { risk: 'moderate', label: 'Moderate', icon: '⚖️', name: "Fixed-Ratio",
-      desc: "Stake size is tied to overall session profit — it only grows once profit clears a threshold, and shrinks back toward base stake as losses reduce that profit. Grows with success rather than chasing losses." }
+      desc: "Stake size is tied to overall session profit — it only grows once profit clears a threshold, and shrinks back toward base stake as losses reduce that profit. Grows with success rather than chasing losses.",
+      drawdown: "Moderate-to-low drawdown risk. Stake can only grow after profit has already accumulated, and shrinks back toward base stake as losses eat into that profit — so a losing streak that follows a winning streak gives back gains gradually rather than escalating the original bet." }
   };
 
   function updateBotInfo() {
@@ -996,7 +1065,10 @@
     if (!info || !box) return;
     box.innerHTML =
       '<span class="info-risk ' + info.risk + '">' + info.label + '</span>' +
-      '<span>' + info.desc + '</span>';
+      '<div>' +
+        '<div>' + info.desc + '</div>' +
+        '<div class="info-drawdown"><strong>Drawdown:</strong> ' + info.drawdown + '</div>' +
+      '</div>';
   }
 
   // ── BOT PICKER QUIZ ──
@@ -1041,6 +1113,7 @@
       '<div class="quiz-result-card">' +
         '<h4>' + info.icon + ' ' + info.name + '</h4>' +
         '<p>' + info.desc + '</p>' +
+        '<p style="background:var(--dark2);border-radius:8px;padding:10px 12px;margin-bottom:14px;"><strong style="color:#FF9800;">Drawdown:</strong> ' + info.drawdown + '</p>' +
         '<button class="btn-full btn-full-gold" onclick="applyQuizSuggestion(\'' + suggested + '\')">Use this bot</button>' +
       '</div>' +
       '<p style="font-size:12px;color:var(--text-dim);margin-top:12px;text-align:center;">This is a starting suggestion based on your answers, not financial advice — you can pick any bot regardless.</p>';
@@ -1472,6 +1545,13 @@
     const cls = amount.toString().startsWith('+') ? 'profit' : amount.toString().startsWith('-') ? 'loss' : '';
     e.innerHTML = `<span>${action}</span><span style="color:var(--text-dim);font-size:12px;font-family:'Space Mono',monospace">${id}</span><span class="${cls}">${amount}</span>`;
     c.insertBefore(e, c.firstChild);
+    // Cap DOM growth — on a long unattended run (auto-restart left on for
+    // hours/days) the log would otherwise grow without bound and gradually
+    // slow the page down. Newest entries are at the top, so trim from the
+    // bottom (oldest) once the cap is exceeded.
+    while (c.children.length > MAX_LOG_ENTRIES) {
+      c.removeChild(c.lastChild);
+    }
   }
 
   function logout() {
@@ -1484,6 +1564,10 @@
     insufficientBalanceAlertShown = false;
     tabThrottleWarned = false;
     setBotConfigLocked(false);
+    isIntentionalClose = true;
+    lastWsUrl = null;
+    reconnectAttempts = 0;
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     if (socket) { socket.close(); socket = null; }
