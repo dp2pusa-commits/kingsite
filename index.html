@@ -580,6 +580,14 @@
   let totalTrades = 0, totalWins = 0, consecutiveLosses = 0, currentStreak = 0, streakType = null;
   let autoRestartTimer = null, botPaused = false;
 
+  // ── RELIABILITY / SAFETY STATE ──
+  const settledContracts = new Set();   // prevents double-counting a contract that streams multiple "is_sold" updates
+  const MAX_STAKE_MULTIPLE = 32;        // hard ceiling: Martingale/D'Alembert can never push stake past baseStake * this
+  let activeContractId = null;          // contract currently open, so Stop can cancel its subscription
+  let awaitingResponse = false;         // true while waiting on a proposal/buy reply, used for the watchdog timer
+  let responseTimeoutTimer = null;      // watchdog so a dropped reply doesn't hang the bot silently
+  const RESPONSE_TIMEOUT_MS = 15000;
+
   // ── PKCE HELPERS ──
   function generateRandom(length) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -833,12 +841,16 @@
   function startBot() {
     if (!currentToken) { alert('Please connect your Deriv account first.'); openModal(); return; }
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
+    if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     botRunning = true;
     botPaused = false;
     baseStake = parseFloat(document.getElementById('stake').value);
     currentStake = baseStake;
     totalProfit = 0; totalTrades = 0; totalWins = 0;
     consecutiveLosses = 0; currentStreak = 0; streakType = null;
+    settledContracts.clear();
+    activeContractId = null;
+    awaitingResponse = false;
     document.getElementById('log-entries').innerHTML = '';
     updateStats();
     setStatus('🟢 Running', 'var(--green)');
@@ -849,13 +861,32 @@
   function stopBot(reason) {
     botRunning = false;
     botPaused = false;
+    awaitingResponse = false;
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
+    if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
+    // Unsubscribe from the currently open contract so handleContract can't fire
+    // again after Stop was pressed and place an unwanted "one more trade".
+    if (activeContractId) {
+      send({ proposal_open_contract: 1, contract_id: activeContractId, subscribe: 0 });
+      activeContractId = null;
+    }
     setStatus('⏸ Stopped', 'var(--text-dim)');
     addLog('🔴 Bot stopped | P&L: ' + (totalProfit >= 0 ? '+' : '') + '$' + Math.abs(totalProfit).toFixed(2), '', '');
   }
 
   function placeTrade() {
     if (!botRunning || !socket) return;
+
+    // Insufficient balance check — stop before sending a trade we already
+    // know the account can't cover, instead of waiting on a Deriv API error.
+    if (currentStake > balance) {
+      botRunning = false;
+      setStatus('⚠️ Insufficient Balance', '#FF9800');
+      addLog('⚠️ Stopped — stake $' + currentStake.toFixed(2) + ' exceeds balance $' + balance.toFixed(2), '', '');
+      alert('Bot stopped: your account balance ($' + balance.toFixed(2) + ') is lower than the next trade stake ($' + currentStake.toFixed(2) + '). Add funds or lower your stake to continue.');
+      return;
+    }
+
     const bot = document.getElementById('bot-select').value;
     const marketUi = document.getElementById('market-select').value;
     const symbol = marketSymbolMap[marketUi] || marketUi;
@@ -910,21 +941,43 @@
 
     const reqId = send(proposal);
     pendingProposals[reqId] = { contractType, symbol };
+    startResponseWatchdog('proposal');
   }
 
   function handleProposal(data) {
+    clearResponseWatchdog();
     const info = pendingProposals[data.req_id];
     delete pendingProposals[data.req_id];
     if (data.error || !data.proposal) {
       addLog('❌ Proposal failed: ' + (data.error ? data.error.message : 'unknown'), '', '');
+      if (botRunning) setTimeout(placeTrade, 1500);
       return;
     }
-    send({ buy: data.proposal.id, price: currentStake });
+    if (!botRunning) return; // Stop was pressed while this proposal was in flight — don't buy
+    // Buy at the price Deriv actually quoted (ask_price), not just whatever
+    // currentStake happened to be — the quote can move between request and reply.
+    const askPrice = parseFloat(data.proposal.ask_price);
+    const buyPrice = isFinite(askPrice) ? askPrice : currentStake;
+    startResponseWatchdog('buy');
+    send({ buy: data.proposal.id, price: buyPrice });
   }
 
   function handleBuy(data) {
-    if (data.error) { addLog('❌ Error: ' + data.error.message, '', ''); return; }
+    clearResponseWatchdog();
+    if (data.error) {
+      addLog('❌ Error: ' + data.error.message, '', '');
+      if (botRunning) setTimeout(placeTrade, 1500);
+      return;
+    }
     if (data.buy) {
+      if (!botRunning) {
+        // Stop was pressed after this buy was already sent — the trade went through,
+        // so don't silently drop it. Unsubscribe immediately and log it as final.
+        send({ proposal_open_contract: 1, contract_id: data.buy.contract_id, subscribe: 0 });
+        addLog('📤 Trade placed (after stop — letting it settle)', data.buy.contract_id || '', '$' + currentStake.toFixed(2));
+        return;
+      }
+      activeContractId = data.buy.contract_id;
       addLog('📤 Trade placed', data.buy.contract_id || '', '$' + currentStake.toFixed(2));
       send({ proposal_open_contract: 1, contract_id: data.buy.contract_id, subscribe: 1 });
     }
@@ -933,6 +986,17 @@
   function handleContract(data) {
     const c = data.proposal_open_contract;
     if (!c || !c.is_sold) return;
+
+    // proposal_open_contract streams on every tick while a contract is open,
+    // then again (possibly more than once) once it settles. Without this guard
+    // the same contract_id can be counted as a win/loss multiple times,
+    // corrupting P&L, win rate, and streak tracking.
+    const contractId = c.contract_id;
+    if (contractId && settledContracts.has(contractId)) return;
+    if (contractId) settledContracts.add(contractId);
+
+    if (contractId === activeContractId) activeContractId = null;
+
     const profit = parseFloat(c.profit);
     const isWin = profit >= 0;
 
@@ -956,6 +1020,10 @@
     document.getElementById('dash-balance').textContent = 'USD ' + balance.toFixed(2);
     addLog(isWin ? '✅ Win' : '❌ Loss', c.contract_id || '', (profit >= 0 ? '+' : '') + '$' + Math.abs(profit).toFixed(2));
     updateStats();
+
+    // If Stop was pressed while this contract was settling, record the
+    // result but don't schedule another trade or trigger auto-restart logic.
+    if (!botRunning) return;
 
     const tp = parseFloat(document.getElementById('take-profit').value);
     const sl = parseFloat(document.getElementById('stop-loss').value);
@@ -989,12 +1057,41 @@
       return;
     }
 
-    // Stake adjustment by strategy
+    // Stake adjustment by strategy, with a hard ceiling so Martingale/D'Alembert
+    // can never run away past a fixed multiple of the base stake — even if
+    // stop-loss is set high or "no limit" is chosen for max loss streak.
     const bot = document.getElementById('bot-select').value;
+    const stakeCeiling = baseStake * MAX_STAKE_MULTIPLE;
     if (bot === 'martingale') currentStake = !isWin ? currentStake * 2 : baseStake;
     else if (bot === 'dalembert') currentStake = !isWin ? currentStake + baseStake : Math.max(baseStake, currentStake - baseStake);
 
+    if (currentStake > stakeCeiling) {
+      botRunning = false;
+      setStatus('⚠️ Max Stake Reached', '#FF9800');
+      addLog('⚠️ Stake hit safety ceiling ($' + stakeCeiling.toFixed(2) + ') — bot stopped', '', '');
+      scheduleAutoRestart(autoRestartDelay, 'stake ceiling');
+      return;
+    }
+
     if (botRunning) setTimeout(placeTrade, 1500);
+  }
+
+  // ── RESPONSE WATCHDOG ──
+  // Guards against a proposal/buy reply that never arrives (dropped connection,
+  // server hiccup) leaving the bot silently stuck with no feedback to the user.
+  function startResponseWatchdog(stage) {
+    awaitingResponse = true;
+    if (responseTimeoutTimer) clearTimeout(responseTimeoutTimer);
+    responseTimeoutTimer = setTimeout(() => {
+      if (!awaitingResponse || !botRunning) return;
+      awaitingResponse = false;
+      addLog('⚠️ No response from Deriv (' + stage + ') — retrying', '', '');
+      if (botRunning) setTimeout(placeTrade, 2000);
+    }, RESPONSE_TIMEOUT_MS);
+  }
+  function clearResponseWatchdog() {
+    awaitingResponse = false;
+    if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
   }
 
   function scheduleAutoRestart(delaySeconds, reason) {
@@ -1024,7 +1121,11 @@
     sessionStorage.clear();
     botRunning = false;
     botPaused = false;
+    awaitingResponse = false;
+    activeContractId = null;
+    settledContracts.clear();
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
+    if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     if (socket) { socket.close(); socket = null; }
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('landing').style.display = 'block';
