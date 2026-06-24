@@ -468,14 +468,14 @@
       <div class="bot-controls">
         <h3>⚙️ Bot Configuration</h3>
         <div class="controls-grid">
-          <div class="control-group"><label>Bot Strategy</label><select id="bot-select"><option value="martingale">🤖 Martingale Pro</option><option value="dalembert">📈 D'Alembert</option><option value="accumulator">🔁 Accumulator</option><option value="boomcrash">💥 Boom/Crash</option><option value="evenodd">🎯 Even/Odd Digit</option><option value="overunder">🔬 Over/Under</option></select></div>
-          <div class="control-group"><label>Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
-          <div class="control-group"><label>Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" /></div>
-          <div class="control-group"><label>Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" /></div>
-          <div class="control-group"><label>Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" /></div>
-          <div class="control-group"><label>Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
-          <div class="control-group"><label>Max Loss Streak</label><select id="max-streak"><option value="3">3 losses → pause</option><option value="5" selected>5 losses → pause</option><option value="7">7 losses → pause</option><option value="0">No limit</option></select></div>
-          <div class="control-group"><label>Auto-Restart</label><select id="auto-restart"><option value="0">Off</option><option value="30">After 30 seconds</option><option value="60" selected>After 1 minute</option><option value="300">After 5 minutes</option></select></div>
+          <div class="control-group"><label for="bot-select">Bot Strategy</label><select id="bot-select"><option value="martingale">🤖 Martingale Pro</option><option value="dalembert">📈 D'Alembert</option><option value="accumulator">🔁 Accumulator</option><option value="boomcrash">💥 Boom/Crash</option><option value="evenodd">🎯 Even/Odd Digit</option><option value="overunder">🔬 Over/Under</option></select></div>
+          <div class="control-group"><label for="market-select">Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
+          <div class="control-group"><label for="stake">Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" inputmode="decimal" /></div>
+          <div class="control-group"><label for="take-profit">Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" step="0.01" inputmode="decimal" /></div>
+          <div class="control-group"><label for="stop-loss">Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" step="0.01" inputmode="decimal" /></div>
+          <div class="control-group"><label for="duration">Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
+          <div class="control-group"><label for="max-streak">Max Loss Streak</label><select id="max-streak"><option value="3">3 losses → pause</option><option value="5" selected>5 losses → pause</option><option value="7">7 losses → pause</option><option value="0">No limit</option></select></div>
+          <div class="control-group"><label for="auto-restart">Auto-Restart</label><select id="auto-restart"><option value="0">Off</option><option value="30">After 30 seconds</option><option value="60" selected>After 1 minute</option><option value="300">After 5 minutes</option></select></div>
         </div>
         <div class="bot-run-btns">
           <button class="btn-run btn-run-start" id="btn-start" onclick="startBot()">▶ Run Bot</button>
@@ -591,6 +591,8 @@
   let insufficientBalanceAlertShown = false;
   let tabThrottleWarned = false;        // only warn once per session about background-tab throttling
   let lastTickAt = Date.now();
+  let lastValidTakeProfit = 10;          // fallback if the TP field is edited into something invalid mid-run
+  let lastValidStopLoss = 10;            // fallback if the SL field is edited into something invalid mid-run
 
   // ── PKCE HELPERS ──
   function generateRandom(length) {
@@ -615,11 +617,32 @@
   }
 
   // ── CHECK FOR TOKEN ON LOAD ──
+  // NOTE: oauth_state/oauth_code_verifier are generated in loginWithDeriv()
+  // and stored before redirecting to Deriv. The actual exchange of the
+  // authorization code for a token happens on callback.html (not this file),
+  // which is where the `state` param Deriv sends back must be compared
+  // against sessionStorage's 'oauth_state' before trusting the result —
+  // that's the real CSRF protection and it has to live there, since that's
+  // the page Deriv redirects to. What we can do here is: (a) if callback.html
+  // forwards the state value back to us as a query param, double-check it
+  // matches before accepting the token, and (b) make sure the one-time
+  // verifier/state values are cleared after use so they can't be replayed.
   function checkToken() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+    const returnedState = params.get('state');
     if (token) {
+      const expectedState = sessionStorage.getItem('oauth_state');
+      if (returnedState && expectedState && returnedState !== expectedState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        sessionStorage.removeItem('oauth_state');
+        sessionStorage.removeItem('oauth_code_verifier');
+        alert('Login could not be verified (state mismatch) — please try connecting your account again.');
+        return;
+      }
       window.history.replaceState({}, document.title, window.location.pathname);
+      sessionStorage.removeItem('oauth_state');
+      sessionStorage.removeItem('oauth_code_verifier');
       sessionStorage.setItem('deriv_token', token);
       initDashboard(token);
       return;
@@ -849,7 +872,46 @@
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     watchdogToken++; // invalidate any leftover watchdog from a previous run
 
-    const startStake = parseFloat(document.getElementById('stake').value);
+    // ── INPUT VALIDATION ──
+    // parseFloat() on an empty or non-numeric field returns NaN, and every
+    // NaN comparison (>, >=, <=) evaluates to false. That means an invalid
+    // Stake/Take-Profit/Stop-Loss field wouldn't throw an error — it would
+    // silently disable the insufficient-balance, take-profit, and stop-loss
+    // checks entirely, letting the bot trade with no safety net. Validate
+    // explicitly before any of that logic runs, on both manual start and
+    // auto-restart.
+    const stakeRaw = parseFloat(document.getElementById('stake').value);
+    const tpRaw = parseFloat(document.getElementById('take-profit').value);
+    const slRaw = parseFloat(document.getElementById('stop-loss').value);
+
+    if (!isFinite(stakeRaw) || stakeRaw < 0.35) {
+      addLog('❌ Cannot start — Base Stake must be a number of at least $0.35', '', '');
+      setStatus('⚠️ Invalid Stake', '#FF9800');
+      if (!isAutoRestart) alert('Base Stake must be a valid number of at least $0.35.');
+      return;
+    }
+    if (!isFinite(tpRaw) || tpRaw <= 0) {
+      addLog('❌ Cannot start — Take Profit must be a number greater than $0', '', '');
+      setStatus('⚠️ Invalid Take Profit', '#FF9800');
+      if (!isAutoRestart) alert('Take Profit must be a valid number greater than $0.');
+      return;
+    }
+    if (!isFinite(slRaw) || slRaw <= 0) {
+      addLog('❌ Cannot start — Stop Loss must be a number greater than $0', '', '');
+      setStatus('⚠️ Invalid Stop Loss', '#FF9800');
+      if (!isAutoRestart) alert('Stop Loss must be a valid number greater than $0.');
+      return;
+    }
+    if (tpRaw < stakeRaw) {
+      addLog('❌ Cannot start — Take Profit ($' + tpRaw.toFixed(2) + ') is less than Base Stake ($' + stakeRaw.toFixed(2) + ')', '', '');
+      setStatus('⚠️ Invalid Take Profit', '#FF9800');
+      if (!isAutoRestart) alert('Take Profit ($' + tpRaw.toFixed(2) + ') should be at least as large as your Base Stake ($' + stakeRaw.toFixed(2) + '), or the bot may stop after a single winning trade.');
+      return;
+    }
+
+    const startStake = stakeRaw;
+    lastValidTakeProfit = tpRaw;
+    lastValidStopLoss = slRaw;
 
     // If this is an automatic restart (after take-profit/stop-loss/streak-pause),
     // check the balance can actually cover the configured base stake first.
@@ -1055,10 +1117,30 @@
     // result but don't schedule another trade or trigger auto-restart logic.
     if (!botRunning) return;
 
-    const tp = parseFloat(document.getElementById('take-profit').value);
-    const sl = parseFloat(document.getElementById('stop-loss').value);
-    const maxStreak = parseInt(document.getElementById('max-streak').value);
-    const autoRestartDelay = parseInt(document.getElementById('auto-restart').value);
+    // Re-read TP/SL/streak/restart settings live each trade so changes the
+    // user makes mid-session take effect. But if the field was edited into
+    // something invalid (cleared, non-numeric) while the bot is running,
+    // parseFloat/parseInt would return NaN and silently disable that safety
+    // check for every remaining trade. Fall back to the last known-good
+    // value instead, and tell the user once so they know why.
+    let tp = parseFloat(document.getElementById('take-profit').value);
+    let sl = parseFloat(document.getElementById('stop-loss').value);
+    const maxStreakRaw = parseInt(document.getElementById('max-streak').value);
+    const autoRestartDelay = parseInt(document.getElementById('auto-restart').value) || 0;
+
+    if (!isFinite(tp) || tp <= 0) {
+      tp = lastValidTakeProfit;
+      addLog('⚠️ Take Profit field is invalid — still using $' + tp.toFixed(2), '', '');
+    } else {
+      lastValidTakeProfit = tp;
+    }
+    if (!isFinite(sl) || sl <= 0) {
+      sl = lastValidStopLoss;
+      addLog('⚠️ Stop Loss field is invalid — still using $' + sl.toFixed(2), '', '');
+    } else {
+      lastValidStopLoss = sl;
+    }
+    const maxStreak = isFinite(maxStreakRaw) ? maxStreakRaw : 0;
 
     // Take profit hit
     if (totalProfit >= tp) {
