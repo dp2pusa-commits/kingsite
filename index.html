@@ -22,7 +22,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Space Grotesk', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; }
 
-    /* TICKER */
     .ticker-wrap { background: var(--dark2); border-bottom: 1px solid var(--border); overflow: hidden; padding: 8px 0; }
     .ticker-track { display: flex; gap: 48px; animation: ticker 30s linear infinite; white-space: nowrap; width: max-content; }
     .ticker-item { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
@@ -30,7 +29,6 @@
     .ticker-item span.down { color: var(--red); }
     @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-    /* NAV */
     nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 48px; background: rgba(10,10,15,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
     .nav-logo { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--gold); letter-spacing: 2px; }
     .nav-logo span { color: var(--text-dim); }
@@ -43,7 +41,6 @@
     .btn-gold { background: var(--gold); color: var(--dark); border: none; padding: 8px 20px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .btn-gold:hover { background: #FFC200; }
 
-    /* HERO */
     .hero { min-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px 24px; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
     .hero-eyebrow { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px; border: 1px solid var(--border); padding: 6px 16px; border-radius: 20px; background: rgba(255,215,0,0.05); }
@@ -56,7 +53,6 @@
     .btn-hero-secondary { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.2); padding: 16px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; font-family: 'Space Grotesk', sans-serif; }
     .btn-hero-secondary:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* MODAL */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .modal-overlay.active { display: flex; }
     .modal { background: var(--dark2); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 440px; position: relative; }
@@ -77,7 +73,6 @@
     .token-hint { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; line-height: 1.6; }
     .token-hint a { color: var(--gold); }
 
-    /* SECTIONS */
     section { padding: 100px 48px; }
     .section-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 16px; }
     .section-title { font-size: clamp(28px, 4vw, 48px); font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
@@ -128,7 +123,6 @@
     .footer-logo { font-family: 'Space Mono', monospace; font-size: 16px; color: var(--gold); letter-spacing: 2px; }
     footer p { color: var(--text-dim); font-size: 13px; }
 
-    /* DASHBOARD */
     #dashboard { display: none; }
     #landing { display: block; }
     .dashboard-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 48px; background: var(--dark2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
@@ -336,7 +330,7 @@
   let socket = null, botRunning = false, currentToken = null, currentAccountId = null;
   let balance = 0, totalProfit = 0, baseStake = 1, currentStake = 1;
   let reqIdCounter = 1;
-  const pendingProposals = {}; // req_id -> info needed once proposal comes back
+  const pendingProposals = {};
 
   // ── PKCE HELPERS ──
   function generateRandom(length) {
@@ -374,7 +368,7 @@
     if (saved) initDashboard(saved);
   }
 
-  // ── TOKEN LOGIN (legacy PAT tokens, e.g. a1-xxxx, still used by the manual tab) ──
+  // ── TOKEN LOGIN ──
   function connectToken() {
     const token = document.getElementById('token-input').value.trim();
     if (!token) { alert('Please enter a valid Deriv API token'); return; }
@@ -444,7 +438,7 @@
     }
   }
 
-  // ── WEBSOCKET (new API: URL is pre-authenticated via OTP) ──
+  // ── WEBSOCKET ──
   function connectWebSocket(wsUrl) {
     socket = new WebSocket(wsUrl);
     socket.onopen = () => {
@@ -474,7 +468,7 @@
     return obj.req_id;
   }
 
-  // ── TICKER (new API symbol names) ──
+  // ── TICKER ──
   const tickerMap = { '1HZ10V':'t-r10','1HZ25V':'t-r25','1HZ50V':'t-r50','1HZ75V':'t-r75','1HZ100V':'t-r100','BOOM500':'t-boom','CRASH500':'t-crash' };
   let lastPrices = {};
   function updateTicker(tick) {
@@ -488,7 +482,7 @@
     lastPrices[tick.symbol] = price;
   }
 
-  // ── MARKET SELECT MAPPING (UI keeps old labels, maps to new symbol names) ──
+  // ── MARKET SYMBOL MAP ──
   const marketSymbolMap = { 'R_10':'1HZ10V','R_25':'1HZ25V','R_50':'1HZ50V','R_75':'1HZ75V','R_100':'1HZ100V','BOOM500':'BOOM500','CRASH500':'CRASH500' };
 
   // ── BOT ──
@@ -506,34 +500,75 @@
     botRunning = false;
     addLog('🔴 Bot stopped | P&L: ' + (totalProfit >= 0 ? '+' : '') + totalProfit.toFixed(2), '', '');
   }
+
   function placeTrade() {
     if (!botRunning || !socket) return;
     const bot = document.getElementById('bot-select').value;
     const marketUi = document.getElementById('market-select').value;
     const symbol = marketSymbolMap[marketUi] || marketUi;
-    const dur = document.getElementById('duration').value;
-    let contractType = Math.random() > 0.5 ? 'MULTUP' : 'MULTDOWN';
-    if (bot === 'evenodd') contractType = Math.random() > 0.5 ? 'DIGITEVEN' : 'DIGITODD';
-    else if (bot === 'overunder') contractType = Math.random() > 0.5 ? 'DIGITOVER' : 'DIGITUNDER';
 
-    const reqId = send({
+    // Determine contract type based on bot strategy
+    let contractType;
+    if (bot === 'evenodd') {
+      contractType = Math.random() > 0.5 ? 'DIGITEVEN' : 'DIGITODD';
+    } else if (bot === 'overunder') {
+      contractType = Math.random() > 0.5 ? 'DIGITOVER' : 'DIGITUNDER';
+    } else {
+      // martingale, dalembert, accumulator, boomcrash all use CALL/PUT (Rise/Fall)
+      contractType = Math.random() > 0.5 ? 'CALL' : 'PUT';
+    }
+
+    // DIGIT contracts require ticks; CALL/PUT require at least 5 ticks
+    // Use safe defaults based on contract type
+    let durNum, durUnit;
+    const durVal = document.getElementById('duration').value;
+    if (contractType === 'DIGITEVEN' || contractType === 'DIGITODD' ||
+        contractType === 'DIGITOVER' || contractType === 'DIGITUNDER') {
+      // Digit contracts: 1–10 ticks only
+      durNum = parseInt(durVal) || 5;
+      durUnit = 't';
+    } else {
+      // CALL/PUT: minimum 5 ticks
+      const rawNum = parseInt(durVal);
+      const rawUnit = durVal.replace(/[0-9]/g, '');
+      if (rawUnit === 't' && rawNum < 5) {
+        durNum = 5;
+        durUnit = 't';
+      } else {
+        durNum = rawNum || 5;
+        durUnit = rawUnit || 't';
+      }
+    }
+
+    const proposal = {
       proposal: 1,
       amount: currentStake,
       basis: 'stake',
       contract_type: contractType,
       currency: 'USD',
-      duration: parseInt(dur),
-      duration_unit: dur.replace(/[0-9]/g, ''),
+      duration: durNum,
+      duration_unit: durUnit,
       underlying_symbol: symbol
-    });
+    };
+
+    // DIGITOVER/DIGITUNDER require a barrier
+    if (contractType === 'DIGITOVER') proposal.barrier = '4';
+    if (contractType === 'DIGITUNDER') proposal.barrier = '5';
+
+    const reqId = send(proposal);
     pendingProposals[reqId] = { contractType, symbol };
   }
+
   function handleProposal(data) {
     const info = pendingProposals[data.req_id];
     delete pendingProposals[data.req_id];
-    if (data.error || !data.proposal) { addLog('❌ Proposal failed: ' + (data.error ? data.error.message : 'unknown'), '', ''); return; }
+    if (data.error || !data.proposal) {
+      addLog('❌ Proposal failed: ' + (data.error ? data.error.message : 'unknown'), '', '');
+      return;
+    }
     send({ buy: data.proposal.id, price: currentStake });
   }
+
   function handleBuy(data) {
     if (data.error) { addLog('❌ Error: ' + data.error.message, '', ''); return; }
     if (data.buy) {
@@ -541,6 +576,7 @@
       send({ proposal_open_contract: 1, contract_id: data.buy.contract_id, subscribe: 1 });
     }
   }
+
   function handleContract(data) {
     const c = data.proposal_open_contract;
     if (!c || !c.is_sold) return;
@@ -558,6 +594,7 @@
     else if (bot === 'dalembert') currentStake = profit < 0 ? currentStake + baseStake : Math.max(baseStake, currentStake - baseStake);
     if (botRunning) setTimeout(placeTrade, 1500);
   }
+
   function addLog(action, id, amount) {
     const c = document.getElementById('log-entries');
     const empty = c.querySelector('.log-empty');
@@ -568,6 +605,7 @@
     e.innerHTML = `<span>${action}</span><span style="color:var(--text-dim);font-size:12px;font-family:'Space Mono',monospace">${id}</span><span class="${cls}">${amount}</span>`;
     c.insertBefore(e, c.firstChild);
   }
+
   function logout() {
     sessionStorage.clear();
     botRunning = false;
