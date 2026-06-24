@@ -182,6 +182,26 @@
     .control-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; font-weight: 500; }
     .control-group select, .control-group input { width: 100%; background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none; }
     .control-group select:focus, .control-group input:focus { border-color: var(--gold); }
+
+    /* BOT PICKER + INFO BOX */
+    .bot-pick-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 14px; }
+    .btn-help-choose { background: var(--dark3); border: 1px solid var(--border); color: var(--gold); padding: 10px 16px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .btn-help-choose:hover { border-color: var(--gold); background: rgba(255,215,0,0.08); }
+    .bot-info-box { background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: var(--text-dim); line-height: 1.6; display: flex; gap: 10px; align-items: flex-start; }
+    .bot-info-box .info-risk { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; font-family: 'Space Mono', monospace; white-space: nowrap; margin-top: 1px; }
+    .bot-info-box .info-risk.aggressive { background: rgba(255,68,68,0.15); color: #FF6B6B; }
+    .bot-info-box .info-risk.moderate { background: rgba(255,215,0,0.1); color: var(--gold); }
+    .bot-info-box .info-risk.safe { background: rgba(0,230,118,0.1); color: var(--green); }
+
+    /* QUIZ MODAL */
+    .quiz-step { display: none; }
+    .quiz-step.active { display: block; }
+    .quiz-option { display: block; width: 100%; text-align: left; background: var(--dark3); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; font-size: 14px; transition: all 0.2s; }
+    .quiz-option:hover { border-color: var(--gold); background: rgba(255,215,0,0.05); }
+    .quiz-result-card { background: var(--dark3); border: 1px solid var(--gold); border-radius: 10px; padding: 20px; margin-top: 8px; }
+    .quiz-result-card h4 { font-size: 16px; margin-bottom: 8px; color: var(--gold); }
+    .quiz-result-card p { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
+
     .bot-run-btns { display: flex; gap: 12px; }
     .btn-run { padding: 12px 28px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
     .btn-run-start { background: var(--green); color: var(--dark); }
@@ -245,6 +265,9 @@
       .controls-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
       .control-group label { font-size: 11px; }
       .control-group select, .control-group input { padding: 10px 10px; font-size: 13px; }
+      .bot-pick-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .btn-help-choose { width: 100%; padding: 12px; }
+      .bot-info-box { font-size: 12px; padding: 12px; }
 
       /* Big tap-friendly run buttons */
       .bot-run-btns { gap: 10px; }
@@ -352,7 +375,7 @@
     <div style="max-width:1200px;margin:0 auto;">
       <div class="section-label">Trading Bots</div>
       <div class="section-title">Pre-built strategies, automated</div>
-      <div class="section-subtitle">Six strategy templates ready to configure on your Deriv account. Win-rate figures below are illustrative of strategy type, not guaranteed or historical performance.</div>
+      <div class="section-subtitle">Ten strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
       <div class="bots-grid">
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with stake doubling on losses. Configurable max steps and base stake. Higher risk of large losses during long losing streaks.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale, but still carries risk of loss.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
@@ -360,6 +383,9 @@
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><p>Configured for Boom/Crash indices, with automated entry/exit logic.</p><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div></div>
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><p>Predicts Even or Odd last digit with streak detection logic.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎲</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Matches/Differs</h3><p>Predicts whether the last digit will match or differ from a chosen target digit. A different digit-contract signal from Even/Odd or Over/Under.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🛡️</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Oscar's Grind</h3><p>A gentler money-management style than Martingale: stake increases by one unit only after a win, and resets once a small profit target is reached. Designed to recover slowly and cautiously rather than chase losses.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">⚖️</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Fixed-Ratio</h3><p>Stake scales with session profit — it grows only as profit builds up, and shrinks back toward your base stake as losses mount, instead of chasing losses like Martingale.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
       </div>
     </div>
   </section>
@@ -467,8 +493,25 @@
     <div id="panel-bot" class="dash-panel active">
       <div class="bot-controls">
         <h3>⚙️ Bot Configuration</h3>
+        <div class="bot-pick-row">
+          <div class="control-group" style="flex:1;">
+            <label for="bot-select">Bot Strategy</label>
+            <select id="bot-select" onchange="updateBotInfo()">
+              <option value="martingale">🤖 Martingale Pro</option>
+              <option value="dalembert">📈 D'Alembert</option>
+              <option value="accumulator">🔁 Accumulator</option>
+              <option value="boomcrash">💥 Boom/Crash</option>
+              <option value="evenodd">🎯 Even/Odd Digit</option>
+              <option value="overunder">🔬 Over/Under</option>
+              <option value="matchesdiffers">🎲 Matches/Differs</option>
+              <option value="oscarsgrind">🛡️ Oscar's Grind</option>
+              <option value="fixedratio">⚖️ Fixed-Ratio</option>
+            </select>
+          </div>
+          <button type="button" class="btn-help-choose" onclick="openBotQuiz()">🧭 Help me choose</button>
+        </div>
+        <div class="bot-info-box" id="bot-info-box"></div>
         <div class="controls-grid">
-          <div class="control-group"><label for="bot-select">Bot Strategy</label><select id="bot-select"><option value="martingale">🤖 Martingale Pro</option><option value="dalembert">📈 D'Alembert</option><option value="accumulator">🔁 Accumulator</option><option value="boomcrash">💥 Boom/Crash</option><option value="evenodd">🎯 Even/Odd Digit</option><option value="overunder">🔬 Over/Under</option></select></div>
           <div class="control-group"><label for="market-select">Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
           <div class="control-group"><label for="stake">Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" inputmode="decimal" /></div>
           <div class="control-group"><label for="take-profit">Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" step="0.01" inputmode="decimal" /></div>
@@ -545,6 +588,33 @@
   </div>
 </div>
 
+<!-- BOT PICKER QUIZ -->
+<div class="modal-overlay" id="quiz-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBotQuiz()">✕</button>
+    <h2>Help me choose a bot</h2>
+    <p>Two quick questions — this is just a starting suggestion, not advice. You can pick any bot regardless of the result.</p>
+
+    <div class="quiz-step active" id="quiz-step-1">
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">How do you feel about risk?</div>
+      <button class="quiz-option" onclick="quizAnswer('risk','low')">🛡️ I want to minimize swings, even if it's slower</button>
+      <button class="quiz-option" onclick="quizAnswer('risk','medium')">📈 I'm fine with some ups and downs</button>
+      <button class="quiz-option" onclick="quizAnswer('risk','high')">🔥 I want higher risk for a shot at faster gains</button>
+    </div>
+
+    <div class="quiz-step" id="quiz-step-2">
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:14px;">How do you want stakes to behave after a loss?</div>
+      <button class="quiz-option" onclick="quizAnswer('stake','flat')">Keep the stake the same every time</button>
+      <button class="quiz-option" onclick="quizAnswer('stake','grow_slow')">Increase it a little, cautiously</button>
+      <button class="quiz-option" onclick="quizAnswer('stake','grow_fast')">Double it to try to recover the loss</button>
+    </div>
+
+    <div class="quiz-step" id="quiz-step-result">
+      <div id="quiz-result-content"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -593,6 +663,7 @@
   let lastTickAt = Date.now();
   let lastValidTakeProfit = 10;          // fallback if the TP field is edited into something invalid mid-run
   let lastValidStopLoss = 10;            // fallback if the SL field is edited into something invalid mid-run
+  let grindCycleProfit = 0;              // Oscar's Grind tracks its own small target separate from overall session P&L
 
   // ── PKCE HELPERS ──
   function generateRandom(length) {
@@ -669,12 +740,14 @@
     document.getElementById('tab-token').classList.toggle('active', tab==='token');
   }
   document.getElementById('modal').addEventListener('click', e => { if (e.target===document.getElementById('modal')) closeModal(); });
+  document.getElementById('quiz-modal').addEventListener('click', e => { if (e.target===document.getElementById('quiz-modal')) closeBotQuiz(); });
 
   // ── INIT DASHBOARD ──
   async function initDashboard(token) {
     currentToken = token;
     document.getElementById('landing').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
+    updateBotInfo();
     await connectViaOtp(token);
   }
 
@@ -866,6 +939,93 @@
     el.style.color = color || 'var(--text)';
   }
 
+  // ── BOT METADATA ──
+  // Single source of truth for each bot's risk label and plain-language
+  // description, used by both the inline info box under the dropdown and
+  // the "Help me choose" quiz result — so the two never drift out of sync.
+  const BOT_INFO = {
+    martingale:    { risk: 'aggressive', label: 'Aggressive', icon: '🤖', name: "Martingale Pro",
+      desc: "Doubles the stake after every loss, resets to base stake after a win. Can recover a losing streak quickly, but a long streak can escalate the stake fast — that's why this site enforces a hard stake ceiling." },
+    dalembert:     { risk: 'moderate', label: 'Moderate', icon: '📈', name: "D'Alembert",
+      desc: "Increases stake by one unit on a loss, decreases by one unit on a win. Milder than Martingale, but stake still grows during a losing streak." },
+    accumulator:   { risk: 'safe', label: 'Lower-variance', icon: '🔁', name: "Accumulator",
+      desc: "Keeps the stake flat regardless of recent results. The simplest, most predictable option — no stake escalation in either direction." },
+    boomcrash:     { risk: 'aggressive', label: 'Aggressive', icon: '💥', name: "Boom/Crash",
+      desc: "Configured for the Boom/Crash spike indices specifically, rather than the smoother Volatility indices. Spike-based markets can move sharply." },
+    evenodd:       { risk: 'moderate', label: 'Moderate', icon: '🎯', name: "Even/Odd Digit",
+      desc: "Predicts whether the next digit will be even or odd. Flat stake by default — pick a money-management bot separately if you want stake scaling." },
+    overunder:     { risk: 'safe', label: 'Lower-variance', icon: '🔬', name: "Over/Under",
+      desc: "Predicts whether the next digit will fall over or under a barrier. Flat stake, digit-contract style." },
+    matchesdiffers:{ risk: 'moderate', label: 'Moderate', icon: '🎲', name: "Matches/Differs",
+      desc: "Predicts whether the next digit will match or differ from a randomly chosen target digit each trade. A different digit signal from Even/Odd or Over/Under." },
+    oscarsgrind:   { risk: 'safe', label: 'Lower-variance', icon: '🛡️', name: "Oscar's Grind",
+      desc: "A cautious money-management style: stake only ever increases after a win (never after a loss), by one unit at a time, resetting once a small profit target is hit. Designed to avoid chasing losses." },
+    fixedratio:    { risk: 'moderate', label: 'Moderate', icon: '⚖️', name: "Fixed-Ratio",
+      desc: "Stake size is tied to overall session profit — it only grows once profit clears a threshold, and shrinks back toward base stake as losses reduce that profit. Grows with success rather than chasing losses." }
+  };
+
+  function updateBotInfo() {
+    const bot = document.getElementById('bot-select').value;
+    const info = BOT_INFO[bot];
+    const box = document.getElementById('bot-info-box');
+    if (!info || !box) return;
+    box.innerHTML =
+      '<span class="info-risk ' + info.risk + '">' + info.label + '</span>' +
+      '<span>' + info.desc + '</span>';
+  }
+
+  // ── BOT PICKER QUIZ ──
+  // A short, optional, two-question helper that suggests a starting bot
+  // based on stated risk tolerance and stake-management preference. It's
+  // explicitly framed as a suggestion, not advice, and never auto-selects
+  // anything — the user reviews the result and clicks to apply it (or not).
+  const quizAnswers = { risk: null, stake: null };
+
+  function openBotQuiz() {
+    quizAnswers.risk = null;
+    quizAnswers.stake = null;
+    document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('quiz-step-1').classList.add('active');
+    document.getElementById('quiz-modal').classList.add('active');
+  }
+  function closeBotQuiz() {
+    document.getElementById('quiz-modal').classList.remove('active');
+  }
+  function quizAnswer(question, value) {
+    quizAnswers[question] = value;
+    if (question === 'risk') {
+      document.getElementById('quiz-step-1').classList.remove('active');
+      document.getElementById('quiz-step-2').classList.add('active');
+      return;
+    }
+    // Both answered — compute a suggestion.
+    document.getElementById('quiz-step-2').classList.remove('active');
+    document.getElementById('quiz-step-result').classList.add('active');
+
+    let suggested;
+    if (quizAnswers.stake === 'flat') {
+      suggested = quizAnswers.risk === 'high' ? 'boomcrash' : 'accumulator';
+    } else if (quizAnswers.stake === 'grow_slow') {
+      suggested = quizAnswers.risk === 'low' ? 'oscarsgrind' : 'fixedratio';
+    } else { // grow_fast
+      suggested = quizAnswers.risk === 'low' ? 'dalembert' : 'martingale';
+    }
+
+    const info = BOT_INFO[suggested];
+    document.getElementById('quiz-result-content').innerHTML =
+      '<div class="quiz-result-card">' +
+        '<h4>' + info.icon + ' ' + info.name + '</h4>' +
+        '<p>' + info.desc + '</p>' +
+        '<button class="btn-full btn-full-gold" onclick="applyQuizSuggestion(\'' + suggested + '\')">Use this bot</button>' +
+      '</div>' +
+      '<p style="font-size:12px;color:var(--text-dim);margin-top:12px;text-align:center;">This is a starting suggestion based on your answers, not financial advice — you can pick any bot regardless.</p>';
+  }
+  function applyQuizSuggestion(botKey) {
+    document.getElementById('bot-select').value = botKey;
+    updateBotInfo();
+    closeBotQuiz();
+  }
+
   function startBot(isAutoRestart) {
     if (!currentToken) { alert('Please connect your Deriv account first.'); openModal(); return; }
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
@@ -930,6 +1090,7 @@
     currentStake = baseStake;
     totalProfit = 0; totalTrades = 0; totalWins = 0;
     consecutiveLosses = 0; currentStreak = 0; streakType = null;
+    grindCycleProfit = 0;
     settledContracts.clear();
     activeContractId = null;
     if (!isAutoRestart) { insufficientBalanceAlertShown = false; tabThrottleWarned = false; }
@@ -989,8 +1150,12 @@
       contractType = Math.random() > 0.5 ? 'DIGITEVEN' : 'DIGITODD';
     } else if (bot === 'overunder') {
       contractType = Math.random() > 0.5 ? 'DIGITOVER' : 'DIGITUNDER';
+    } else if (bot === 'matchesdiffers') {
+      contractType = Math.random() > 0.5 ? 'DIGITMATCH' : 'DIGITDIFF';
     } else {
-      // martingale, dalembert, accumulator, boomcrash all use CALL/PUT (Rise/Fall)
+      // martingale, dalembert, accumulator, boomcrash, oscarsgrind, fixedratio
+      // all use CALL/PUT (Rise/Fall) — they differ in stake management, not
+      // in which contract type they trade.
       contractType = Math.random() > 0.5 ? 'CALL' : 'PUT';
     }
 
@@ -999,7 +1164,8 @@
     let durNum, durUnit;
     const durVal = document.getElementById('duration').value;
     if (contractType === 'DIGITEVEN' || contractType === 'DIGITODD' ||
-        contractType === 'DIGITOVER' || contractType === 'DIGITUNDER') {
+        contractType === 'DIGITOVER' || contractType === 'DIGITUNDER' ||
+        contractType === 'DIGITMATCH' || contractType === 'DIGITDIFF') {
       // Digit contracts: 1–10 ticks only
       durNum = parseInt(durVal) || 5;
       durUnit = 't';
@@ -1027,9 +1193,10 @@
       underlying_symbol: symbol
     };
 
-    // DIGITOVER/DIGITUNDER require a barrier
+    // DIGITOVER/DIGITUNDER require a barrier; DIGITMATCH/DIGITDIFF require a target digit
     if (contractType === 'DIGITOVER') proposal.barrier = '4';
     if (contractType === 'DIGITUNDER') proposal.barrier = '5';
+    if (contractType === 'DIGITMATCH' || contractType === 'DIGITDIFF') proposal.barrier = String(Math.floor(Math.random() * 10));
 
     const reqId = send(proposal);
     pendingProposals[reqId] = { contractType, symbol };
@@ -1169,13 +1336,44 @@
       return;
     }
 
-    // Stake adjustment by strategy, with a hard ceiling so Martingale/D'Alembert
-    // can never run away past a fixed multiple of the base stake — even if
-    // stop-loss is set high or "no limit" is chosen for max loss streak.
+    // Stake adjustment by strategy, with a hard ceiling so any strategy that
+    // increases stake on a loss can never run away past a fixed multiple of
+    // the base stake — even if stop-loss is set high or "no limit" is chosen
+    // for max loss streak.
     const bot = document.getElementById('bot-select').value;
     const stakeCeiling = baseStake * MAX_STAKE_MULTIPLE;
-    if (bot === 'martingale') currentStake = !isWin ? currentStake * 2 : baseStake;
-    else if (bot === 'dalembert') currentStake = !isWin ? currentStake + baseStake : Math.max(baseStake, currentStake - baseStake);
+
+    if (bot === 'martingale') {
+      currentStake = !isWin ? currentStake * 2 : baseStake;
+    } else if (bot === 'dalembert') {
+      currentStake = !isWin ? currentStake + baseStake : Math.max(baseStake, currentStake - baseStake);
+    } else if (bot === 'oscarsgrind') {
+      // Oscar's Grind: stake only ever increases by one base-stake unit,
+      // and only after a win — never after a loss. This is the opposite
+      // risk shape from Martingale: it never chases a loss by raising the
+      // stake, it just waits for the next win at the same stake. Once the
+      // small per-cycle profit target (1 base stake) is reached, the cycle
+      // resets back to the base stake.
+      grindCycleProfit += profit;
+      if (isWin) {
+        if (grindCycleProfit >= baseStake) {
+          currentStake = baseStake;
+          grindCycleProfit = 0;
+        } else {
+          currentStake = currentStake + baseStake;
+        }
+      }
+      // on a loss, currentStake deliberately stays the same
+    } else if (bot === 'fixedratio') {
+      // Fixed-Ratio: stake is a function of total accumulated session
+      // profit, not the immediately preceding trade. It only grows once
+      // profit clears a unit threshold (here: every full baseStake of
+      // profit adds one unit to the stake), and shrinks back down as
+      // profit gives way to losses — so it can never spiral the way
+      // loss-chasing strategies can.
+      const profitUnits = Math.max(0, Math.floor(totalProfit / baseStake));
+      currentStake = baseStake + profitUnits * baseStake;
+    }
 
     if (currentStake > stakeCeiling) {
       botRunning = false;
