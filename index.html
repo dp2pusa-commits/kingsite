@@ -584,9 +584,13 @@
   const settledContracts = new Set();   // prevents double-counting a contract that streams multiple "is_sold" updates
   const MAX_STAKE_MULTIPLE = 32;        // hard ceiling: Martingale/D'Alembert can never push stake past baseStake * this
   let activeContractId = null;          // contract currently open, so Stop can cancel its subscription
-  let awaitingResponse = false;         // true while waiting on a proposal/buy reply, used for the watchdog timer
   let responseTimeoutTimer = null;      // watchdog so a dropped reply doesn't hang the bot silently
+  let watchdogToken = 0;                // bumped on every new request; a timeout only fires if its token is still current,
+                                         // so a slow-but-eventually-successful reply can never race with a stale retry
   const RESPONSE_TIMEOUT_MS = 15000;
+  let insufficientBalanceAlertShown = false;
+  let tabThrottleWarned = false;        // only warn once per session about background-tab throttling
+  let lastTickAt = Date.now();
 
   // ── PKCE HELPERS ──
   function generateRandom(length) {
@@ -786,6 +790,7 @@
   const tickerMap = { '1HZ10V':'t-r10','1HZ25V':'t-r25','1HZ50V':'t-r50','1HZ75V':'t-r75','1HZ100V':'t-r100','BOOM500':'t-boom','CRASH500':'t-crash' };
   let lastPrices = {};
   function updateTicker(tick) {
+    lastTickAt = Date.now();
     const el = document.getElementById(tickerMap[tick.symbol]);
     if (!el) return;
     const price = parseFloat(tick.quote).toFixed(2);
@@ -838,30 +843,46 @@
     el.style.color = color || 'var(--text)';
   }
 
-  function startBot() {
+  function startBot(isAutoRestart) {
     if (!currentToken) { alert('Please connect your Deriv account first.'); openModal(); return; }
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
+    watchdogToken++; // invalidate any leftover watchdog from a previous run
+
+    const startStake = parseFloat(document.getElementById('stake').value);
+
+    // If this is an automatic restart (after take-profit/stop-loss/streak-pause),
+    // check the balance can actually cover the configured base stake first.
+    // Without this, a low-balance account would auto-restart, immediately hit
+    // the insufficient-balance stop, and loop that every restart interval —
+    // each time popping a blocking alert(). Silently hold instead and log it.
+    if (isAutoRestart && startStake > balance) {
+      setStatus('⚠️ Balance Too Low', '#FF9800');
+      addLog('⚠️ Auto-restart skipped — balance $' + balance.toFixed(2) + ' is below base stake $' + startStake.toFixed(2) + '. Add funds and start manually.', '', '');
+      return;
+    }
+
     botRunning = true;
     botPaused = false;
-    baseStake = parseFloat(document.getElementById('stake').value);
+    baseStake = startStake;
     currentStake = baseStake;
     totalProfit = 0; totalTrades = 0; totalWins = 0;
     consecutiveLosses = 0; currentStreak = 0; streakType = null;
     settledContracts.clear();
     activeContractId = null;
-    awaitingResponse = false;
+    if (!isAutoRestart) { insufficientBalanceAlertShown = false; tabThrottleWarned = false; }
+    lastTickAt = Date.now();
     document.getElementById('log-entries').innerHTML = '';
     updateStats();
     setStatus('🟢 Running', 'var(--green)');
-    addLog('🟢 Bot started', '', '');
+    addLog(isAutoRestart ? '🔄 Bot auto-restarted' : '🟢 Bot started', '', '');
     placeTrade();
   }
 
   function stopBot(reason) {
     botRunning = false;
     botPaused = false;
-    awaitingResponse = false;
+    watchdogToken++; // invalidate any pending watchdog timeout
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     // Unsubscribe from the currently open contract so handleContract can't fire
@@ -886,7 +907,13 @@
       botRunning = false;
       setStatus('⚠️ Insufficient Balance', '#FF9800');
       addLog('⚠️ Stopped — balance $' + balance.toFixed(2) + ' is below the $' + currentStake.toFixed(2) + ' stake', '', '');
-      alert('Bot stopped: your Options account balance ($' + balance.toFixed(2) + ') is too low to cover the next trade stake ($' + currentStake.toFixed(2) + ').\n\nTransfer funds into your Deriv Options trading account, then restart the bot.');
+      // alert() blocks the page and would stack up if this bot is left running
+      // unattended and keeps retrying — show it once per session, rely on the
+      // status bar + log (which are always visible) for anything after that.
+      if (!insufficientBalanceAlertShown) {
+        insufficientBalanceAlertShown = true;
+        alert('Bot stopped: your Options account balance ($' + balance.toFixed(2) + ') is too low to cover the next trade stake ($' + currentStake.toFixed(2) + ').\n\nTransfer funds into your Deriv Options trading account, then restart the bot.');
+      }
       return;
     }
 
@@ -1082,18 +1109,21 @@
   // ── RESPONSE WATCHDOG ──
   // Guards against a proposal/buy reply that never arrives (dropped connection,
   // server hiccup) leaving the bot silently stuck with no feedback to the user.
+  // Uses a token rather than a plain boolean: if a reply arrives just as the
+  // timeout is about to fire, bumping the token invalidates the pending
+  // timeout so it can never trigger a duplicate placeTrade() for a request
+  // that actually succeeded (or was already retried) a moment later.
   function startResponseWatchdog(stage) {
-    awaitingResponse = true;
+    const myToken = ++watchdogToken;
     if (responseTimeoutTimer) clearTimeout(responseTimeoutTimer);
     responseTimeoutTimer = setTimeout(() => {
-      if (!awaitingResponse || !botRunning) return;
-      awaitingResponse = false;
+      if (myToken !== watchdogToken || !botRunning) return;
       addLog('⚠️ No response from Deriv (' + stage + ') — retrying', '', '');
-      if (botRunning) setTimeout(placeTrade, 2000);
+      setTimeout(placeTrade, 2000);
     }, RESPONSE_TIMEOUT_MS);
   }
   function clearResponseWatchdog() {
-    awaitingResponse = false;
+    watchdogToken++; // invalidate any in-flight timeout immediately
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
   }
 
@@ -1103,8 +1133,7 @@
     addLog('⏳ Auto-restart in ' + delaySeconds + 's after ' + reason, '', '');
     autoRestartTimer = setTimeout(() => {
       if (!botRunning) {
-        addLog('🔄 Auto-restarting bot...', '', '');
-        startBot();
+        startBot(true);
       }
     }, delaySeconds * 1000);
   }
@@ -1124,9 +1153,11 @@
     sessionStorage.clear();
     botRunning = false;
     botPaused = false;
-    awaitingResponse = false;
+    watchdogToken++;
     activeContractId = null;
     settledContracts.clear();
+    insufficientBalanceAlertShown = false;
+    tabThrottleWarned = false;
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     if (socket) { socket.close(); socket = null; }
@@ -1155,6 +1186,29 @@
     document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
     if (!isOpen) item.classList.add('open');
   }
+
+  // ── BACKGROUND-TAB THROTTLING AWARENESS ──
+  // Mobile and desktop browsers heavily throttle timers (setTimeout/setInterval)
+  // in backgrounded or inactive tabs — sometimes to once a minute or less. That
+  // can silently stall trade cadence or make the response watchdog fire
+  // constantly. We can't prevent the throttling, but we can warn the user
+  // clearly instead of leaving them to wonder why the bot looks stuck.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && botRunning && !tabThrottleWarned) {
+      tabThrottleWarned = true;
+      addLog('⚠️ Tab is in the background — browsers slow bots down when the tab isn\'t active. Keep this tab open and in view for reliable trading.', '', '');
+    }
+  });
+
+  // Secondary check: if ticks stop arriving for well beyond their normal
+  // cadence while the bot is running, surface it even if visibilitychange
+  // didn't fire (e.g. OS-level app switch on mobile rather than tab switch).
+  setInterval(() => {
+    if (botRunning && (Date.now() - lastTickAt) > 30000 && !tabThrottleWarned) {
+      tabThrottleWarned = true;
+      addLog('⚠️ No live price data for 30+ seconds — the browser may be throttling this tab. Bring it to the foreground.', '', '');
+    }
+  }, 10000);
 
   checkToken();
 </script>
