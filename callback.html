@@ -26,14 +26,21 @@
   <div class="spinner" id="spinner"></div>
   <p id="status">Completing your login, please wait...</p>
 </div>
-
 <script>
 const BACKEND_URL = 'https://kingsite-backend.onrender.com';
+const REDIRECT_URI = 'https://dp2pusa-commits.github.io/kingsite/callback.html';
+const FETCH_TIMEOUT_MS = 20000;
 
 function showError(message) {
   document.getElementById('spinner').style.display = 'none';
   document.getElementById('status').innerHTML =
     '<span class="error">' + message + '</span><br><a class="btn" href="./index.html">Back to Home</a>';
+}
+
+function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
 }
 
 (async function handleCallback() {
@@ -42,58 +49,63 @@ function showError(message) {
   const returnedState = params.get('state');
   const error = params.get('error');
   const errorDescription = params.get('error_description');
-
   if (error) {
     showError('Login was cancelled or denied: ' + (errorDescription || error));
     return;
   }
-
   if (!code) {
     showError('No authorization code received from Deriv. Please try logging in again.');
     return;
   }
-
   const savedState = sessionStorage.getItem('oauth_state');
   const codeVerifier = sessionStorage.getItem('oauth_code_verifier');
 
-  if (savedState && returnedState && savedState !== returnedState) {
-    showError('Security check failed (state mismatch). Please start the login again from the homepage.');
+  // Require state to be present AND matching — not just "matching if both
+  // happen to exist". The previous check (savedState && returnedState &&
+  // savedState !== returnedState) silently skipped validation whenever
+  // either value was missing, which defeats the point of a CSRF check:
+  // a crafted callback could omit `state` entirely and walk straight
+  // through. Both must be present and equal.
+  if (!savedState || !returnedState || savedState !== returnedState) {
+    showError('Security check failed (missing or mismatched state). Please start the login again from the homepage.');
     return;
   }
-
   if (!codeVerifier) {
     showError('Login session expired or was opened in a different tab. Please go back and click Login with Deriv again.');
     return;
   }
-
   try {
-    const response = await fetch(BACKEND_URL + '/exchange', {
+    // Use the same fixed REDIRECT_URI that loginWithDeriv() registered with
+    // Deriv when it built the authorization URL — not one reconstructed from
+    // window.location, which can drift from the registered value (trailing
+    // slash, stray query params) and cause Deriv to reject the exchange with
+    // a confusing mismatch error.
+    const response = await fetchWithTimeout(BACKEND_URL + '/exchange', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         code: code,
         code_verifier: codeVerifier,
-        redirect_uri: window.location.origin + window.location.pathname
+        redirect_uri: REDIRECT_URI
       })
-    });
-
+    }, FETCH_TIMEOUT_MS);
     const data = await response.json();
-
     if (!response.ok || !data.access_token) {
       throw new Error(data.error || 'No access_token returned from backend.');
     }
-
     sessionStorage.removeItem('oauth_state');
     sessionStorage.removeItem('oauth_code_verifier');
     sessionStorage.setItem('deriv_token', data.access_token);
     if (data.account) sessionStorage.setItem('deriv_account', data.account);
-
     document.getElementById('status').textContent = 'Login successful! Redirecting...';
     window.location.href = './index.html?token=' + encodeURIComponent(data.access_token);
-
   } catch (err) {
     console.error('Token exchange failed:', err);
-    showError('Login failed while contacting the server. (' + err.message + ')');
+    if (err.name === 'AbortError') {
+      showError('The login server took too long to respond. It may be starting up — please wait a moment and try again.');
+    } else {
+      showError('Login failed while contacting the server. (' + err.message + ')');
+    }
   }
 })();
 </script>
