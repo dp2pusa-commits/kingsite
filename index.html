@@ -414,7 +414,7 @@
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">What is the minimum stake? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">The minimum stake on Deriv is $0.35 USD. We'd suggest starting at the minimum to see how a strategy performs before increasing your stake.</div>
+          <div class="faq-answer">The minimum stake on Deriv is $0.35 USD. We'd suggest starting at the minimum to see how a strategy performs before increasing your stake. Note: the bot trades from your Deriv <strong>Options</strong> account specifically — if your balance shows as too low even though you have funds on Deriv, transfer them from your main wallet into your Options trading account first.</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Can I run multiple bots at once? <span class="faq-icon">+</span></button>
@@ -879,11 +879,14 @@
 
     // Insufficient balance check — stop before sending a trade we already
     // know the account can't cover, instead of waiting on a Deriv API error.
+    // Note: the fix here isn't "lower your stake" — $1 is already close to
+    // the practical floor — it's "add funds to the Options trading account",
+    // since that's the specific Deriv account balance this bot trades from.
     if (currentStake > balance) {
       botRunning = false;
       setStatus('⚠️ Insufficient Balance', '#FF9800');
-      addLog('⚠️ Stopped — stake $' + currentStake.toFixed(2) + ' exceeds balance $' + balance.toFixed(2), '', '');
-      alert('Bot stopped: your account balance ($' + balance.toFixed(2) + ') is lower than the next trade stake ($' + currentStake.toFixed(2) + '). Add funds or lower your stake to continue.');
+      addLog('⚠️ Stopped — balance $' + balance.toFixed(2) + ' is below the $' + currentStake.toFixed(2) + ' stake', '', '');
+      alert('Bot stopped: your Options account balance ($' + balance.toFixed(2) + ') is too low to cover the next trade stake ($' + currentStake.toFixed(2) + ').\n\nTransfer funds into your Deriv Options trading account, then restart the bot.');
       return;
     }
 
