@@ -182,6 +182,8 @@
     .control-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; font-weight: 500; }
     .control-group select, .control-group input { width: 100%; background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none; }
     .control-group select:focus, .control-group input:focus { border-color: var(--gold); }
+    .control-group select:disabled, .control-group input:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-help-choose:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* BOT PICKER + INFO BOX */
     .bot-pick-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 14px; }
@@ -791,6 +793,16 @@
   }
 
   function showAccountPicker(accounts) {
+    // Switching accounts while the bot is running is the most serious gap
+    // here: it would open a second WebSocket without closing the first,
+    // and the bot would keep trading without ever being told the account
+    // underneath it changed. Require an explicit stop first — the user can
+    // always switch with one extra tap, but the bot can never be left
+    // running against a socket that's about to be replaced.
+    if (botRunning) {
+      alert('Please stop the bot before switching accounts.\n\nSwitching while running could place a trade on the wrong account.');
+      return;
+    }
     const overlay = document.getElementById('account-picker-overlay');
     const list = document.getElementById('account-picker-list');
     list.innerHTML = '';
@@ -858,6 +870,15 @@
 
   // ── WEBSOCKET ──
   function connectWebSocket(wsUrl) {
+    // Defense in depth: always close any existing socket before opening a
+    // new one, regardless of caller. The Switch button is now blocked while
+    // the bot is running (see showAccountPicker), but this guards against
+    // any other path that might call connectWebSocket a second time without
+    // having cleaned up the previous connection.
+    if (socket) {
+      try { socket.onclose = null; socket.close(); } catch (e) {}
+      socket = null;
+    }
     socket = new WebSocket(wsUrl);
     socket.onopen = () => {
       send({ balance: 1, subscribe: 1 });
@@ -1025,6 +1046,11 @@
       '<p style="font-size:12px;color:var(--text-dim);margin-top:12px;text-align:center;">This is a starting suggestion based on your answers, not financial advice — you can pick any bot regardless.</p>';
   }
   function applyQuizSuggestion(botKey) {
+    if (botRunning) {
+      alert('Please stop the bot before changing strategy.');
+      closeBotQuiz();
+      return;
+    }
     document.getElementById('bot-select').value = botKey;
     updateBotInfo();
     closeBotQuiz();
@@ -1103,7 +1129,21 @@
     updateStats();
     setStatus('🟢 Running', 'var(--green)');
     addLog(isAutoRestart ? '🔄 Bot auto-restarted' : '🟢 Bot started', '', '');
+    setBotConfigLocked(true);
     placeTrade();
+  }
+
+  // Locks the strategy dropdown and "Help me choose" button while the bot
+  // is running. Previously, applying a quiz suggestion (or just changing
+  // the dropdown) while running would silently swap the live strategy logic
+  // mid-trade — e.g. a flat-stake bot into a Martingale doubling bot — with
+  // no log entry and no confirmation. The bot must be stopped to change
+  // strategy now, same as it already requires for switching accounts.
+  function setBotConfigLocked(locked) {
+    const select = document.getElementById('bot-select');
+    const helpBtn = document.querySelector('.btn-help-choose');
+    if (select) select.disabled = locked;
+    if (helpBtn) helpBtn.disabled = locked;
   }
 
   function stopBot(reason) {
@@ -1118,6 +1158,7 @@
       send({ proposal_open_contract: 1, contract_id: activeContractId, subscribe: 0 });
       activeContractId = null;
     }
+    setBotConfigLocked(false);
     setStatus('⏸ Stopped', 'var(--text-dim)');
     addLog('🔴 Bot stopped | P&L: ' + (totalProfit >= 0 ? '+' : '') + '$' + Math.abs(totalProfit).toFixed(2), '', '');
   }
@@ -1442,6 +1483,7 @@
     settledContracts.clear();
     insufficientBalanceAlertShown = false;
     tabThrottleWarned = false;
+    setBotConfigLocked(false);
     if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
     if (responseTimeoutTimer) { clearTimeout(responseTimeoutTimer); responseTimeoutTimer = null; }
     if (socket) { socket.close(); socket = null; }
