@@ -231,10 +231,13 @@
       .hero p { font-size: 16px; }
 
       /* Dashboard nav */
-      .dashboard-nav { padding: 12px 16px; }
-      .account-badge { font-size: 11px; padding: 6px 10px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .balance-badge { font-size: 12px; padding: 6px 10px; }
-      .btn-logout { padding: 6px 10px; font-size: 12px; }
+      .dashboard-nav { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+      .dashboard-nav .nav-logo { font-size: 16px; }
+      .account-info { gap: 6px; flex-wrap: wrap; }
+      .account-badge { font-size: 10px; padding: 5px 8px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .balance-badge { font-size: 11px; padding: 5px 8px; }
+      .btn-switch { padding: 5px 8px; font-size: 11px; }
+      .btn-logout { padding: 5px 8px; font-size: 11px; }
 
       /* Dashboard content */
       .dashboard-content { padding: 16px 12px 100px; }
@@ -685,6 +688,7 @@
       }
 
       allAccounts = accountsData.data;
+      console.log('Deriv accounts raw data:', JSON.stringify(allAccounts, null, 2));
 
       // If only one account, use it directly
       if (allAccounts.length === 1) {
@@ -707,7 +711,14 @@
     list.innerHTML = '';
     accounts.forEach(acc => {
       const id = acc.id || acc.account_id || acc.loginid;
-      const isDemo = id && (id.toString().startsWith('VR') || id.toString().startsWith('vr') || (acc.account_type && acc.account_type.toLowerCase().includes('virtual')));
+      const isDemo = !!(
+        (acc.is_virtual) ||
+        (acc.account_type && acc.account_type.toLowerCase().includes('virtual')) ||
+        (acc.account_type && acc.account_type.toLowerCase() === 'demo') ||
+        (id && (id.toString().toUpperCase().startsWith('VR') || id.toString().toUpperCase().startsWith('VRTC'))) ||
+        (acc.landing_company_shortcode && acc.landing_company_shortcode === 'virtual') ||
+        (parseFloat(acc.balance) >= 9000 && parseFloat(acc.balance) <= 11000) // Deriv demo default is $10,000
+      );
       const bal = parseFloat(acc.balance || 0).toFixed(2);
       const currency = acc.currency || 'USD';
       const btn = document.createElement('button');
@@ -726,7 +737,13 @@
   async function selectAccount(account) {
     try {
       currentAccountId = account.id || account.account_id || account.loginid;
-      const isDemo = currentAccountId && (currentAccountId.toString().startsWith('VR') || currentAccountId.toString().startsWith('vr') || (account.account_type && account.account_type.toLowerCase().includes('virtual')));
+      const isDemo = !!(
+        (account.is_virtual) ||
+        (account.account_type && account.account_type.toLowerCase().includes('virtual')) ||
+        (account.account_type && account.account_type.toLowerCase() === 'demo') ||
+        (currentAccountId && (currentAccountId.toString().toUpperCase().startsWith('VR') || currentAccountId.toString().toUpperCase().startsWith('VRTC'))) ||
+        (account.landing_company_shortcode && account.landing_company_shortcode === 'virtual')
+      );
 
       document.getElementById('dash-account').textContent = currentAccountId + (isDemo ? ' (Demo)' : ' (Real)');
       document.getElementById('dash-account').style.color = isDemo ? '#FF9800' : 'var(--green)';
