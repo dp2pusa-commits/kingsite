@@ -123,28 +123,22 @@
     .footer-logo { font-family: 'Space Mono', monospace; font-size: 16px; color: var(--gold); letter-spacing: 2px; }
     footer p { color: var(--text-dim); font-size: 13px; }
 
-    /* STATS COUNTER STRIP */
-    .stats-strip { background: var(--dark3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 40px 48px; display: flex; justify-content: center; gap: 64px; flex-wrap: wrap; }
-    .stat-item { text-align: center; }
-    .stat-item .stat-num { font-family: 'Space Mono', monospace; font-size: 36px; font-weight: 700; color: var(--gold); display: block; }
-    .stat-item .stat-desc { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+    /* DISCLOSURE STRIP */
+    .disclosure-strip { background: var(--dark3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 28px 48px; text-align: center; }
+    .disclosure-strip p { color: var(--text-dim); font-size: 13px; max-width: 720px; margin: 0 auto; line-height: 1.7; }
+    .disclosure-strip strong { color: var(--text); }
 
     /* TRUST BADGES */
     .trust-bar { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; padding: 20px 48px; background: var(--dark); border-bottom: 1px solid var(--border); }
     .trust-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dim); }
     .trust-badge span.icon { font-size: 16px; }
 
-    /* TESTIMONIALS */
-    #testimonials { background: var(--dark); }
-    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto; }
-    .testimonial-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; position: relative; }
-    .testimonial-card::before { content: '"'; position: absolute; top: 16px; right: 20px; font-size: 60px; color: var(--gold); opacity: 0.15; font-family: Georgia, serif; line-height: 1; }
-    .testimonial-text { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 20px; }
-    .testimonial-author { display: flex; align-items: center; gap: 12px; }
-    .author-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--dark3); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .author-name { font-weight: 600; font-size: 14px; }
-    .author-meta { font-size: 12px; color: var(--text-dim); }
-    .stars { color: var(--gold); font-size: 13px; margin-bottom: 12px; }
+    /* ABOUT / HONEST INTRO */
+    #about { background: var(--dark); }
+    .about-box { max-width: 760px; margin: 0 auto; background: var(--dark2); border: 1px solid var(--border); border-radius: 14px; padding: 36px; }
+    .about-box p { color: var(--text-dim); font-size: 15px; line-height: 1.8; margin-bottom: 16px; }
+    .about-box p:last-child { margin-bottom: 0; }
+    .about-box strong { color: var(--text); }
 
     /* FAQ */
     #faq { background: var(--dark2); }
@@ -156,11 +150,6 @@
     .faq-answer { display: none; padding: 0 20px 18px; font-size: 14px; color: var(--text-dim); line-height: 1.7; }
     .faq-item.open .faq-answer { display: block; }
     .faq-item.open .faq-icon { transform: rotate(45deg); }
-
-    /* LIVE ACTIVITY */
-    .live-activity { background: var(--dark3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 20px; max-width: 440px; margin: 0 auto 40px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); }
-    .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: blink 1.5s infinite; flex-shrink: 0; }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
     #dashboard { display: none; }
     #landing { display: block; }
@@ -223,12 +212,12 @@
       .nav-btns .btn-outline { display: none; }
       section { padding: 60px 16px; }
       footer { padding: 16px; flex-direction: column; text-align: center; }
-      .stats-strip { gap: 24px; padding: 28px 16px; }
-      .stat-item .stat-num { font-size: 28px; }
+      .disclosure-strip { padding: 20px 16px; }
       .trust-bar { gap: 12px; padding: 16px; }
       .trust-badge { font-size: 11px; }
       .hero { padding: 60px 16px; min-height: 80vh; }
       .hero p { font-size: 16px; }
+      .about-box { padding: 24px; }
 
       /* Dashboard nav */
       .dashboard-nav { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
@@ -310,7 +299,7 @@
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#bots">Bots</a>
-      <a href="#testimonials">Reviews</a>
+      <a href="#about">About</a>
       <a href="#faq">FAQ</a>
       <a href="#how-it-works">How It Works</a>
     </div>
@@ -321,31 +310,29 @@
   </nav>
 
   <div class="hero">
-    <div class="hero-eyebrow">♔ LIVE TRADING PLATFORM</div>
+    <div class="hero-eyebrow">♔ AUTOMATED TRADING TOOL</div>
     <h1>Trade <span class="gold">Smarter.</span><br>Reign Supreme.</h1>
-    <p>Advanced automated trading bots, real-time market data, and seamless Deriv integration. One platform to rule all your trades.</p>
+    <p>Automated trading bots and seamless Deriv integration, connected directly to your own Deriv account. Trading carries real risk of loss — please read how this works below before connecting.</p>
     <div class="hero-btns">
       <a href="https://partner-tracking.deriv.com/click?a=29953&o=1&c=3&link_id=1" target="_blank" class="btn-hero-primary">⚡ CREATE DERIV ACCOUNT</a>
       <button class="btn-hero-secondary" onclick="openModal()">Connect Deriv Account</button>
     </div>
   </div>
 
-  <!-- STATS STRIP -->
-  <div class="stats-strip">
-    <div class="stat-item"><span class="stat-num" id="counter-traders">2,847</span><div class="stat-desc">Active Traders</div></div>
-    <div class="stat-item"><span class="stat-num" id="counter-trades">184,320</span><div class="stat-desc">Trades Executed</div></div>
-    <div class="stat-item"><span class="stat-num">$3.2M+</span><div class="stat-desc">Volume Traded</div></div>
-    <div class="stat-item"><span class="stat-num">99.8%</span><div class="stat-desc">Uptime</div></div>
+  <!-- HONEST DISCLOSURE -->
+  <div class="disclosure-strip">
+    <p><strong>King Site is a new, independently-run tool</strong> — not affiliated with Deriv beyond using their public API and partner program. We earn a small markup on trades placed through the platform. Trading derivatives carries a real risk of losing money, and no bot strategy guarantees a profit.</p>
   </div>
 
   <!-- TRUST BAR -->
   <div class="trust-bar">
     <div class="trust-badge"><span class="icon">🔒</span> SSL Encrypted</div>
-    <div class="trust-badge"><span class="icon">✅</span> Deriv Verified Partner</div>
+    <div class="trust-badge"><span class="icon">🔐</span> Deriv OAuth 2.0 Login</div>
     <div class="trust-badge"><span class="icon">🛡️</span> We Never Store Your Password</div>
     <div class="trust-badge"><span class="icon">⚡</span> Live WebSocket API</div>
-    <div class="trust-badge"><span class="icon">🌍</span> Available Worldwide</div>
   </div>
+
+  <section id="features">
     <div style="max-width:1200px;margin:0 auto;">
       <div class="section-label">Platform Features</div>
       <div class="section-title">Everything you need to trade professionally</div>
@@ -354,7 +341,7 @@
         <div class="feature-card"><div class="feature-icon">🤖</div><h3>Automated Trading Bots</h3><p>Deploy pre-built bots that trade 24/7. Martingale, D'Alembert, and more — fully automated.</p></div>
         <div class="feature-card"><div class="feature-icon">🔐</div><h3>Secure OAuth Login</h3><p>Login with your Deriv account securely via OAuth 2.0. We never store your passwords.</p></div>
         <div class="feature-card"><div class="feature-icon">📊</div><h3>Real-Time Market Data</h3><p>Live tick data streamed directly from Deriv WebSocket API.</p></div>
-        <div class="feature-card"><div class="feature-icon">👑</div><h3>Multi-Account Support</h3><p>Manage multiple Deriv accounts — real and demo — from a single dashboard.</p></div>
+        <div class="feature-card"><div class="feature-icon">👑</div><h3>Multi-Account Support</h3><p>Manage multiple Deriv accounts from a single dashboard.</p></div>
         <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Risk Management</h3><p>Set stop-loss limits, profit targets, and max trade counts to protect your capital.</p></div>
         <div class="feature-card"><div class="feature-icon">📈</div><h3>Trade History</h3><p>Full trade logs with P&L analytics. Understand what works and refine your strategy.</p></div>
       </div>
@@ -364,15 +351,15 @@
   <section id="bots">
     <div style="max-width:1200px;margin:0 auto;">
       <div class="section-label">Trading Bots</div>
-      <div class="section-title">Battle-tested strategies, automated</div>
-      <div class="section-subtitle">Six proven strategies ready to deploy on your Deriv account.</div>
+      <div class="section-title">Pre-built strategies, automated</div>
+      <div class="section-subtitle">Six strategy templates ready to configure on your Deriv account. Win-rate figures below are illustrative of strategy type, not guaranteed or historical performance.</div>
       <div class="bots-grid">
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with smart doubling on losses. Configurable max steps and base stake.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+68%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Rise/Fall</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+72%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Safe</span></div><h3>Accumulator</h3><p>Steady accumulation with configurable growth rates. Minimal risk with consistent compounding.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+81%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Accum.</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><p>Specialized for Boom/Crash indices. Catches spike opportunities with auto entry/exit logic.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+59%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Spikes</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><p>Analyzes tick patterns to predict Even or Odd last digit with streak detection.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+65%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Safe</span></div><h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-stats"><div class="bot-stat"><div class="stat-val">+77%</div><div class="stat-label">Win Rate</div></div><div class="bot-stat"><div class="stat-val">Digits</div><div class="stat-label">Type</div></div></div><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with stake doubling on losses. Configurable max steps and base stake. Higher risk of large losses during long losing streaks.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale, but still carries risk of loss.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Accumulator</h3><p>Flat-stake accumulation strategy with configurable growth rate settings.</p><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><p>Configured for Boom/Crash indices, with automated entry/exit logic.</p><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><p>Predicts Even or Odd last digit with streak detection logic.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div></div>
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Over/Under</h3><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div></div>
       </div>
     </div>
   </section>
@@ -380,37 +367,24 @@
   <section id="how-it-works">
     <div style="max-width:1200px;margin:0 auto;text-align:center;">
       <div class="section-label">Getting Started</div>
-      <div class="section-title">Up and trading in 3 steps</div>
+      <div class="section-title">Up and running in 3 steps</div>
       <div class="steps">
         <div class="step"><div class="step-num">01</div><h3>Connect Your Account</h3><p>Click "Connect Account" and authorize via Deriv OAuth 2.0. Your credentials stay safe.</p></div>
         <div class="step"><div class="step-num">02</div><h3>Choose Your Bot</h3><p>Browse our bot library and configure your strategy — market, stake, profit target and stop-loss.</p></div>
-        <div class="step"><div class="step-num">03</div><h3>Start Trading</h3><p>Hit Run and let your bot trade 24/7. Monitor live P&L and stop anytime.</p></div>
+        <div class="step"><div class="step-num">03</div><h3>Start Trading</h3><p>Hit Run and monitor your bot. Stop anytime. Start small while you learn how a strategy behaves.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- TESTIMONIALS -->
-  <section id="testimonials">
+  <!-- ABOUT / HONEST INTRO -->
+  <section id="about">
     <div style="max-width:1100px;margin:0 auto;text-align:center;">
-      <div class="section-label">Trader Reviews</div>
-      <div class="section-title">What our traders say</div>
-      <div class="section-subtitle">Real feedback from traders using King Site daily.</div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <div class="testimonial-text">The Martingale bot recovered my losses overnight. I woke up to a $47 profit on a $1 stake. This platform is insane.</div>
-          <div class="testimonial-author"><div class="author-avatar">🇳🇬</div><div><div class="author-name">Chukwudi O.</div><div class="author-meta">Lagos, Nigeria · Martingale Bot</div></div></div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <div class="testimonial-text">Finally a Deriv bot platform that actually works. Setup took 2 minutes and the Even/Odd bot has been running for 3 days straight.</div>
-          <div class="testimonial-author"><div class="author-avatar">🇰🇪</div><div><div class="author-name">Brian M.</div><div class="author-meta">Nairobi, Kenya · Even/Odd Bot</div></div></div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">★★★★☆</div>
-          <div class="testimonial-text">Love the dashboard. Clean, fast, and the stop-loss feature saved me from a bad streak. Would love more bot strategies added.</div>
-          <div class="testimonial-author"><div class="author-avatar">🇬🇭</div><div><div class="author-name">Abena K.</div><div class="author-meta">Accra, Ghana · D'Alembert Bot</div></div></div>
-        </div>
+      <div class="section-label">About King Site</div>
+      <div class="section-title">A new, independently-run tool</div>
+      <div class="about-box" style="text-align:left;">
+        <p><strong>King Site is a new platform</strong> built on Deriv's public trading API. It is not Deriv itself, and it's not an established brand with a long track record — it's a small, independently-run project.</p>
+        <p>King Site earns a small markup on trades placed through the platform via Deriv's official partner program. This is separate from your win or loss on any individual trade — you keep whatever your trading results are; we earn our markup either way.</p>
+        <p><strong>Trading derivatives carries real risk.</strong> Automated strategies like Martingale can lose money quickly during a losing streak. No bot or strategy on this site guarantees a profit. Only trade with money you can afford to lose, and consider starting with a small stake while you get a feel for how a strategy behaves.</p>
       </div>
     </div>
   </section>
@@ -424,36 +398,35 @@
       <div class="faq-list" style="text-align:left;">
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Is my Deriv account safe? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">Yes. We use Deriv's official OAuth 2.0 system — the same used by all trusted Deriv partners. We never see or store your password. Your funds stay in your Deriv account at all times.</div>
+          <div class="faq-answer">We use Deriv's official OAuth 2.0 system to connect — we never see or store your password. Your funds stay in your Deriv account at all times; we only have permission to place trades on your behalf.</div>
         </div>
         <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">How do the bots make money? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">The bots place automated trades on your behalf using proven strategies like Martingale and D'Alembert. Profits go directly to your Deriv balance. You control the stake size, take profit, and stop loss at all times.</div>
+          <button class="faq-question" onclick="toggleFaq(this)">How does King Site make money? <span class="faq-icon">+</span></button>
+          <div class="faq-answer">We earn a small markup percentage on trades placed through the platform, via Deriv's official partner/markup program. We earn this whether a trade wins or loses — it's important you understand that our incentive is trading volume, not your personal results, so trade deliberately rather than just to "use the bot."</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Can I lose money? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">Trading always carries risk. The bots include stop-loss protection to limit losses, but no trading strategy guarantees profit. We recommend starting with demo mode and small stakes until you're comfortable.</div>
+          <div class="faq-answer">Yes. Trading always carries risk, and strategies like Martingale can lose money quickly during a losing streak. The bots include stop-loss settings to help limit losses, but no strategy guarantees profit. Start small and only risk money you can afford to lose.</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Do I need a Deriv account? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">Yes — King Site connects directly to your Deriv account. If you don't have one, you can create a free account in minutes using the button above. New accounts come with a $10,000 demo balance to practice with.</div>
+          <div class="faq-answer">Yes — King Site connects directly to your own Deriv account. If you don't have one, you can create a free account using the button above.</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">What is the minimum stake? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">The minimum stake on Deriv is $0.35 USD. We recommend starting with $1 to test your chosen strategy before scaling up.</div>
+          <div class="faq-answer">The minimum stake on Deriv is $0.35 USD. We'd suggest starting at the minimum to see how a strategy performs before increasing your stake.</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Can I run multiple bots at once? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">Currently the dashboard runs one bot at a time per session. Multi-bot support is on our roadmap. You can open multiple browser tabs to run different strategies simultaneously.</div>
+          <div class="faq-answer">Currently the dashboard runs one bot at a time per session. You can open multiple browser tabs to run different strategies simultaneously if you choose to.</div>
         </div>
       </div>
     </div>
   </section>
 
   <div class="cta-section">
-    <div class="live-activity"><div class="live-dot"></div><span id="live-msg">🟢 <strong style="color:var(--text)">23 traders</strong> are running bots right now</span></div>
-    <h2>Ready to trade on autopilot?</h2>
-    <p>Join <strong style="color:var(--gold)">2,800+ traders</strong> using King Site to automate their Deriv strategies — for free.</p>
+    <h2>Ready to get started?</h2>
+    <p>Connect your Deriv account and configure a strategy. Remember: trading carries risk, and we earn our markup regardless of your results — so trade with that in mind.</p>
     <div class="cta-btns">
       <a href="https://partner-tracking.deriv.com/click?a=29953&o=1&c=3&link_id=1" target="_blank" class="btn-hero-primary">⚡ Create Free Deriv Account</a>
       <button class="btn-hero-secondary" onclick="openModal()">Connect & Start Trading</button>
@@ -462,7 +435,7 @@
 
   <footer>
     <div class="footer-logo">♔ KING.SITE</div>
-    <p>© 2025 KING.SITE — Powered by Deriv API</p>
+    <p>© 2025 KING.SITE — Independently run, powered by Deriv API</p>
   </footer>
 </div>
 
@@ -1078,49 +1051,6 @@
     document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
     if (!isOpen) item.classList.add('open');
   }
-
-  // ── ANIMATED COUNTERS ──
-  function animateCounter(el, target, suffix) {
-    const duration = 2000;
-    const start = Date.now();
-    const startVal = 0;
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(startVal + (target - startVal) * ease);
-      el.textContent = current.toLocaleString() + (suffix || '');
-      if (progress >= 1) clearInterval(timer);
-    }, 16);
-  }
-
-  // Run counters when stats strip comes into view
-  const statsObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        animateCounter(document.getElementById('counter-traders'), 2847);
-        animateCounter(document.getElementById('counter-trades'), 184320);
-        statsObserver.disconnect();
-      }
-    });
-  }, { threshold: 0.3 });
-  const statsStrip = document.querySelector('.stats-strip');
-  if (statsStrip) statsObserver.observe(statsStrip);
-
-  // ── LIVE ACTIVITY ROTATOR ──
-  const liveMessages = [
-    '🟢 <strong style="color:var(--text)">23 traders</strong> are running bots right now',
-    '🟢 <strong style="color:var(--text)">Brian M.</strong> just started the Even/Odd bot',
-    '🟢 <strong style="color:var(--text)">A trader from Kenya</strong> made +$4.20 in the last hour',
-    '🟢 <strong style="color:var(--text)">18 new traders</strong> joined today',
-    '🟢 <strong style="color:var(--text)">Martingale bot</strong> completed 47 trades this session',
-  ];
-  let liveIdx = 0;
-  setInterval(() => {
-    liveIdx = (liveIdx + 1) % liveMessages.length;
-    const el = document.getElementById('live-msg');
-    if (el) el.innerHTML = liveMessages[liveIdx];
-  }, 4000);
 
   checkToken();
 </script>
