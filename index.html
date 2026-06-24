@@ -169,6 +169,15 @@
     .account-badge { background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-family: 'Space Mono', monospace; font-size: 13px; }
     .balance-badge { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.2); border-radius: 8px; padding: 8px 16px; font-family: 'Space Mono', monospace; font-size: 13px; color: var(--green); }
     .btn-logout { background: transparent; border: 1px solid rgba(255,68,68,0.4); color: #FF6B6B; padding: 8px 16px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer; }
+    .btn-switch { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:8px 14px; border-radius:6px; font-family:'Space Grotesk',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
+    .btn-switch:hover { border-color:var(--gold); color:var(--gold); }
+    .account-pick-btn { width:100%; background:var(--dark3); border:1px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:all 0.2s; text-align:left; }
+    .account-pick-btn:hover { border-color:var(--gold); background:rgba(255,215,0,0.05); }
+    .account-pick-type { font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; font-family:'Space Mono',monospace; white-space:nowrap; }
+    .account-pick-type.demo { background:rgba(255,152,0,0.15); color:#FF9800; border:1px solid rgba(255,152,0,0.3); }
+    .account-pick-type.real { background:rgba(0,230,118,0.1); color:var(--green); border:1px solid rgba(0,230,118,0.2); }
+    .account-pick-id { font-family:'Space Mono',monospace; font-size:14px; color:var(--text); flex:1; }
+    .account-pick-bal { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:var(--gold); white-space:nowrap; }
     /* LIVE STATS BAR */
     .live-stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
     .live-stat { flex: 1; min-width: 100px; background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
@@ -461,6 +470,7 @@
     <div class="account-info">
       <div class="account-badge" id="dash-account">—</div>
       <div class="balance-badge" id="dash-balance">$ —</div>
+      <button class="btn-switch" onclick="showAccountPicker(allAccounts)" title="Switch account">⇄ Switch</button>
       <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
   </div>
@@ -549,6 +559,16 @@
       </button>
     </div>
   </div>
+
+<!-- ACCOUNT PICKER -->
+<div id="account-picker-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;margin:16px;">
+    <div style="font-size:22px;font-weight:700;margin-bottom:8px;">Select Account</div>
+    <div style="color:var(--text-dim);font-size:14px;margin-bottom:24px;">Choose which account to trade with. Real accounts earn real money.</div>
+    <div id="account-picker-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -647,7 +667,9 @@
     await connectViaOtp(token);
   }
 
-  // ── NEW API: fetch accounts, then OTP, then connect WebSocket ──
+  // ── ACCOUNT PICKER ──
+  let allAccounts = [];
+
   async function connectViaOtp(token) {
     try {
       const accountsRes = await fetch(API_BASE + '/trading/v1/options/accounts', {
@@ -662,17 +684,59 @@
         throw new Error(accountsData.errors ? accountsData.errors[0].message : 'No trading accounts found');
       }
 
-      const account = accountsData.data[0];
-      currentAccountId = account.id || account.account_id || account.loginid;
+      allAccounts = accountsData.data;
 
-      document.getElementById('dash-account').textContent = currentAccountId;
+      // If only one account, use it directly
+      if (allAccounts.length === 1) {
+        await selectAccount(allAccounts[0]);
+        return;
+      }
+
+      // Multiple accounts — show picker
+      showAccountPicker(allAccounts);
+
+    } catch (err) {
+      console.error('Account/OTP setup failed:', err);
+      alert('Could not connect to your Deriv account: ' + err.message);
+    }
+  }
+
+  function showAccountPicker(accounts) {
+    const overlay = document.getElementById('account-picker-overlay');
+    const list = document.getElementById('account-picker-list');
+    list.innerHTML = '';
+    accounts.forEach(acc => {
+      const id = acc.id || acc.account_id || acc.loginid;
+      const isDemo = id && (id.toString().startsWith('VR') || id.toString().startsWith('vr') || (acc.account_type && acc.account_type.toLowerCase().includes('virtual')));
+      const bal = parseFloat(acc.balance || 0).toFixed(2);
+      const currency = acc.currency || 'USD';
+      const btn = document.createElement('button');
+      btn.className = 'account-pick-btn';
+      btn.innerHTML = `
+        <div class="account-pick-type ${isDemo ? 'demo' : 'real'}">${isDemo ? '🎮 DEMO' : '💰 REAL'}</div>
+        <div class="account-pick-id">${id}</div>
+        <div class="account-pick-bal">${currency} ${bal}</div>
+      `;
+      btn.onclick = () => { overlay.style.display = 'none'; selectAccount(acc); };
+      list.appendChild(btn);
+    });
+    overlay.style.display = 'flex';
+  }
+
+  async function selectAccount(account) {
+    try {
+      currentAccountId = account.id || account.account_id || account.loginid;
+      const isDemo = currentAccountId && (currentAccountId.toString().startsWith('VR') || currentAccountId.toString().startsWith('vr') || (account.account_type && account.account_type.toLowerCase().includes('virtual')));
+
+      document.getElementById('dash-account').textContent = currentAccountId + (isDemo ? ' (Demo)' : ' (Real)');
+      document.getElementById('dash-account').style.color = isDemo ? '#FF9800' : 'var(--green)';
       balance = parseFloat(account.balance || 0);
       document.getElementById('dash-balance').textContent = (account.currency || 'USD') + ' ' + balance.toFixed(2);
 
       const otpRes = await fetch(API_BASE + '/trading/v1/options/accounts/' + currentAccountId + '/otp', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + token,
+          'Authorization': 'Bearer ' + currentToken,
           'Deriv-App-ID': APP_ID
         }
       });
@@ -685,8 +749,8 @@
       connectWebSocket(otpData.data.url);
 
     } catch (err) {
-      console.error('Account/OTP setup failed:', err);
-      alert('Could not connect to your Deriv account: ' + err.message);
+      console.error('Account selection failed:', err);
+      alert('Could not connect to account: ' + err.message);
     }
   }
 
