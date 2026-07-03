@@ -59,6 +59,7 @@
     .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; }
     .modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
     .modal p { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+    .modal-disclosure { background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--text-dim); line-height: 1.6; margin: -18px 0 24px; }
     .login-tabs { display: flex; margin-bottom: 28px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     .login-tab { flex: 1; padding: 10px; background: transparent; border: none; color: var(--text-dim); font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .login-tab.active { background: var(--gold); color: var(--dark); }
@@ -129,6 +130,8 @@
     .disclosure-strip { background: var(--dark3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 28px 48px; text-align: center; }
     .disclosure-strip p { color: var(--text-dim); font-size: 13px; max-width: 720px; margin: 0 auto; line-height: 1.7; }
     .disclosure-strip strong { color: var(--text); }
+    .disclosure-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+    .disclosure-badge { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-dim); background: var(--dark); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; }
 
     /* TRUST BADGES */
     .trust-bar { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; padding: 20px 48px; background: var(--dark); border-bottom: 1px solid var(--border); }
@@ -155,10 +158,15 @@
 
     #dashboard { display: none; }
     #landing { display: block; }
-    .dashboard-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 48px; background: var(--dark2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    .account-info { display: flex; align-items: center; gap: 16px; }
+    .dashboard-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; background: rgba(17,17,24,0.92); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .account-info { display: flex; align-items: center; gap: 12px; }
+    .status-dot { display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-dim); padding: 8px 14px; background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; }
+    .status-dot .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); box-shadow: 0 0 0 3px rgba(136,136,160,0.15); transition: all 0.3s; }
+    .status-dot.live .dot { background: var(--green); box-shadow: 0 0 0 3px rgba(0,230,118,0.18); animation: pulse-dot 2s ease-in-out infinite; }
+    .status-dot.stopped .dot { background: #FF6B6B; box-shadow: 0 0 0 3px rgba(255,68,68,0.18); }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
     .account-badge { background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-family: 'Space Mono', monospace; font-size: 13px; }
-    .balance-badge { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.2); border-radius: 8px; padding: 8px 16px; font-family: 'Space Mono', monospace; font-size: 13px; color: var(--green); }
+    .balance-badge { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.2); border-radius: 8px; padding: 8px 16px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
     .btn-logout { background: transparent; border: 1px solid rgba(255,68,68,0.4); color: #FF6B6B; padding: 8px 16px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer; }
     .btn-switch { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:8px 14px; border-radius:6px; font-family:'Space Grotesk',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
     .btn-switch:hover { border-color:var(--gold); color:var(--gold); }
@@ -170,16 +178,21 @@
     .account-pick-id { font-family:'Space Mono',monospace; font-size:14px; color:var(--text); flex:1; }
     .account-pick-bal { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:var(--gold); white-space:nowrap; }
     /* LIVE STATS BAR */
-    .live-stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-    .live-stat { flex: 1; min-width: 100px; background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
-    .live-stat-val { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .live-stats-bar { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .live-stat { flex: 1; min-width: 100px; background: linear-gradient(180deg, var(--dark2) 0%, var(--dark3) 100%); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.18); }
+    .live-stat-val { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
     .live-stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
 
-    .dashboard-content { padding: 40px 48px; max-width: 1200px; margin: 0 auto; }
-    .dashboard-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-    .dashboard-subtitle { color: var(--text-dim); font-size: 15px; margin-bottom: 40px; }
-    .bot-controls { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
-    .bot-controls h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+    .dashboard-content { padding: 32px 32px 56px; max-width: 1360px; margin: 0 auto; }
+    .dashboard-title { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .dashboard-subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+    .dashboard-side { display: flex; flex-direction: column; gap: 24px; position: sticky; top: 84px; }
+    .panel-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .panel-card-header h3 { margin-bottom: 0 !important; }
+    .panel-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    .bot-controls { background: var(--dark2); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); position: relative; }
+    .bot-controls h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
     .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
     .control-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; font-weight: 500; }
     .control-group select, .control-group input { width: 100%; background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none; }
@@ -215,6 +228,12 @@
     .bot-info-box .info-drawdown { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--text-dim); }
     .bot-info-box .info-drawdown strong { color: #FF9800; }
 
+    /* EQUITY SPARKLINE */
+    .equity-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 14px; padding: 20px 20px 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
+    .equity-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .equity-value { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    #equity-sparkline { width: 100%; height: 56px; display: block; }
+
     /* QUIZ MODAL */
     .quiz-step { display: none; }
     .quiz-step.active { display: block; }
@@ -228,9 +247,14 @@
     .btn-run { padding: 12px 28px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
     .btn-run-start { background: var(--green); color: var(--dark); }
     .btn-run-stop { background: transparent; border: 1px solid #FF4444 !important; color: #FF6B6B; }
-    .trade-log { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
-    .trade-log h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
-    .log-entry { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+    .trade-log { background: var(--dark2); border: 1px solid var(--border); border-radius: 14px; padding: 24px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
+    .trade-log h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    #log-entries { max-height: 420px; overflow-y: auto; padding-right: 4px; }
+    #log-entries::-webkit-scrollbar { width: 6px; }
+    #log-entries::-webkit-scrollbar-track { background: transparent; }
+    #log-entries::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+    .log-entry { display: flex; justify-content: space-between; align-items: center; padding: 11px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; font-variant-numeric: tabular-nums; transition: background 0.15s; }
+    .log-entry:hover { background: rgba(255,255,255,0.02); }
     .log-entry:last-child { border-bottom: none; }
     .log-empty { color: var(--text-dim); font-size: 14px; text-align: center; padding: 40px; }
     .profit { color: var(--green); font-family: 'Space Mono', monospace; }
@@ -243,11 +267,24 @@
     .mobile-nav-item .nav-icon { font-size: 20px; }
     .mobile-nav-item.active { color: var(--gold); }
 
-    /* ── MOBILE DASHBOARD PANELS ── */
-    .dash-panel { display: none; }
-    .dash-panel.active { display: block; }
+    /* dash-panel visibility is mobile-only (tab switching) — see the
+       max-width:768px media query below. On desktop all panels render at
+       once in the two-column grid. */
+
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .dashboard-side { position: static; flex-direction: row; flex-wrap: wrap; }
+      .dashboard-side > * { flex: 1; min-width: 320px; }
+    }
 
     @media (max-width: 768px) {
+      /* Dashboard panels are tab-switched only on mobile; desktop shows
+         all three at once in the two-column grid. */
+      .dash-panel { display: none; }
+      .dash-panel.active { display: block; }
+      .dashboard-grid { display: block; }
+      .dashboard-side { position: static; margin-top: 16px; }
+
       /* Landing */
       nav { padding: 12px 16px; }
       .nav-links { display: none; }
@@ -376,7 +413,12 @@
 
   <!-- HONEST DISCLOSURE -->
   <div class="disclosure-strip">
-    <p><strong>King Site is a new, independently-run tool</strong> — not affiliated with Deriv beyond using their public API and partner program. We earn a small markup on trades placed through the platform. Trading derivatives carries a real risk of losing money, and no bot strategy guarantees a profit.</p>
+    <p><strong>King Site</strong> connects to your own Deriv account using their official public API — your funds always stay with Deriv, never with us. <a href="#faq" style="color:var(--gold);text-decoration:underline;">See how it works and how we're paid →</a></p>
+    <div class="disclosure-badges">
+      <span class="disclosure-badge">🔒 Your funds stay with Deriv</span>
+      <span class="disclosure-badge">📊 Results aren't guaranteed</span>
+      <span class="disclosure-badge">💬 We earn a fee either way</span>
+    </div>
   </div>
 
   <!-- TRUST BAR -->
@@ -407,8 +449,9 @@
     <div style="max-width:1200px;margin:0 auto;">
       <div class="section-label">Trading Bots</div>
       <div class="section-title">Pre-built strategies, automated</div>
-      <div class="section-subtitle">Ten strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
+      <div class="section-subtitle">Eleven strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
       <div class="bots-grid">
+        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🛟</div><span class="bot-badge badge-safe">Capital Preservation</span></div><h3>Capital Guard</h3><p>Flat stake, tight built-in stop-loss/take-profit defaults, a short cooldown after every loss, and a hard cap on trades per session. Designed to limit how much you can lose in total — it does not improve the odds of any individual trade.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Lowest total exposure of any bot here by design — flat stake (no compounding), the tightest default stop-loss, a per-loss cooldown to slow trading pace, and a session trade cap. Each individual trade still carries the same win/loss odds as any other bot; this one just limits how much total capital is ever at risk.</div></div>
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><p>Classic Martingale with stake doubling on losses. Configurable max steps and base stake. Higher risk of large losses during long losing streaks.</p><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Highest here. Stake doubles per loss — 5 losses in a row costs 31× base stake cumulatively, 7 losses costs 127×. This site caps the stake at 32× base, but reaching that point is still a steep drawdown from one streak.</div></div>
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale, but still carries risk of loss.</p><div class="bot-market">Market: <span>R_10 / R_25</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Moderate. Stake rises by one unit per loss rather than doubling — slower to escalate than Martingale, but a long losing streak still adds up.</div></div>
         <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Accumulator</h3><p>Flat-stake accumulation strategy with configurable growth rate settings.</p><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div><div class="bot-drawdown"><strong>Drawdown:</strong> Lowest of the staking styles. Flat stake means a losing streak costs (losses × stake) with no compounding at all.</div></div>
@@ -459,12 +502,16 @@
           <div class="faq-answer">We use Deriv's official OAuth 2.0 system to connect — we never see or store your password. Your funds stay in your Deriv account at all times; we only have permission to place trades on your behalf.</div>
         </div>
         <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">How does King Site make money? <span class="faq-icon">+</span></button>
-          <div class="faq-answer">We earn a small markup percentage on trades placed through the platform, via Deriv's official partner/markup program. We earn this whether a trade wins or loses — it's important you understand that our incentive is trading volume, not your personal results, so trade deliberately rather than just to "use the bot."</div>
+          <button class="faq-question" onclick="toggleFaq(this)">How does King Site make money, and what's the relationship with Deriv? <span class="faq-icon">+</span></button>
+          <div class="faq-answer">King Site is an independently-run tool, not part of Deriv itself — we connect to Deriv purely through their official public API and partner/markup program, the same way any third-party trading tool would. Your Deriv login, funds, and account always stay with Deriv; we only have permission to place trades on your behalf once you connect.<br><br>We earn a small markup percentage on trades placed through the platform via that partner program — and we earn it whether a given trade wins or loses. That means our incentive is trading volume, not your personal results, so it's worth trading deliberately rather than just to "use the bot." Trading derivatives always carries real risk of loss, and no bot or strategy here — including the lower-drawdown ones — guarantees a profit. Start small, and only risk money you can afford to lose.</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Can I lose money? <span class="faq-icon">+</span></button>
           <div class="faq-answer">Yes. Trading always carries risk, and strategies like Martingale can lose money quickly during a losing streak. The bots include stop-loss settings to help limit losses, but no strategy guarantees profit. Start small and only risk money you can afford to lose.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">Which bot has the "least loss possibility"? <span class="faq-icon">+</span></button>
+          <div class="faq-answer">None of them changes the odds of any individual trade — that's determined by the market and Deriv's contract pricing, not by which bot template you pick. What Capital Guard does differently is limit <strong>total exposure</strong>: it keeps the stake flat (never escalates after a loss), defaults to a tighter stop-loss and take-profit, adds a short pause after every loss, and stops the bot outright after a set number of trades per session. That narrows how much you can lose in total — it does not make individual trades more likely to win.</div>
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)">Do I need a Deriv account? <span class="faq-icon">+</span></button>
@@ -500,7 +547,10 @@
 <!-- DASHBOARD -->
 <div id="dashboard">
   <div class="dashboard-nav">
-    <div class="nav-logo">♔ KING<span style="color:var(--text-dim)">.SITE</span></div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="nav-logo">♔ KING<span style="color:var(--text-dim)">.SITE</span></div>
+      <div class="status-dot" id="nav-status-dot"><span class="dot"></span><span id="nav-status-text">Idle</span></div>
+    </div>
     <div class="account-info">
       <div class="account-badge" id="dash-account">—</div>
       <div class="balance-badge" id="dash-balance">$ —</div>
@@ -521,77 +571,93 @@
       <div class="live-stat" style="grid-column: span 2;"><div class="live-stat-val" id="stat-status">⏸ Idle</div><div class="live-stat-label">Bot Status</div></div>
     </div>
 
-    <!-- BOT PANEL -->
-    <div id="panel-bot" class="dash-panel active">
-      <div class="bot-controls">
-        <div class="bot-picker-header">
-          <h3>⚙️ Choose a Bot</h3>
-          <button type="button" class="btn-help-choose" onclick="openBotQuiz()">🧭 Help me choose</button>
-        </div>
-        <!-- Visual card picker: tap a card to select. The underlying <select>
-             stays in the DOM (hidden) so every existing function that reads
-             bot-select.value keeps working unchanged — this is a visual
-             layer on top of the same value, not a new data source. -->
-        <div class="bot-card-grid" id="bot-card-grid"></div>
-        <select id="bot-select" onchange="updateBotInfo()" style="display:none;">
-          <option value="martingale">🤖 Martingale Pro</option>
-          <option value="dalembert">📈 D'Alembert</option>
-          <option value="accumulator">🔁 Accumulator</option>
-          <option value="boomcrash">💥 Boom/Crash</option>
-          <option value="evenodd">🎯 Even/Odd Digit</option>
-          <option value="overunder">🔬 Over/Under</option>
-          <option value="matchesdiffers">🎲 Matches/Differs</option>
-          <option value="oscarsgrind">🛡️ Oscar's Grind</option>
-          <option value="fixedratio">⚖️ Fixed-Ratio</option>
-        </select>
-        <div class="bot-info-box" id="bot-info-box"></div>
-        <h3 style="margin-top:24px;">⚙️ Trade Settings</h3>
-        <div class="controls-grid">
-          <div class="control-group"><label for="market-select">Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
-          <div class="control-group"><label for="stake">Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" inputmode="decimal" /></div>
-          <div class="control-group"><label for="take-profit">Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" step="0.01" inputmode="decimal" /></div>
-          <div class="control-group"><label for="stop-loss">Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" step="0.01" inputmode="decimal" /></div>
-          <div class="control-group"><label for="duration">Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
-          <div class="control-group"><label for="max-streak">Max Loss Streak</label><select id="max-streak"><option value="3">3 losses → pause</option><option value="5" selected>5 losses → pause</option><option value="7">7 losses → pause</option><option value="0">No limit</option></select></div>
-          <div class="control-group"><label for="auto-restart">Auto-Restart</label><select id="auto-restart"><option value="0">Off</option><option value="30">After 30 seconds</option><option value="60" selected>After 1 minute</option><option value="300">After 5 minutes</option></select></div>
-        </div>
-        <div class="bot-run-btns">
-          <button class="btn-run btn-run-start" id="btn-start" onclick="startBot()">▶ Run Bot</button>
-          <button class="btn-run btn-run-stop" onclick="stopBot()">■ Stop</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- LOG PANEL -->
-    <div id="panel-log" class="dash-panel">
-      <div class="trade-log">
-        <h3>📋 Trade Log</h3>
-        <div id="log-entries"><div class="log-empty">No trades yet. Configure and run a bot to start.</div></div>
-      </div>
-    </div>
-
-    <!-- STATS PANEL -->
-    <div id="panel-stats" class="dash-panel">
-      <div class="bot-controls">
-        <h3>📊 Session Statistics</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
-          <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-winrate">—</div><div class="live-stat-label">Win Rate</div></div>
-          <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-trades">0</div><div class="live-stat-label">Total Trades</div></div>
-          <div class="live-stat" style="min-width:unset;"><div class="live-stat-val profit" id="stats2-pnl">$0.00</div><div class="live-stat-label">Session P&L</div></div>
-          <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-wins">0</div><div class="live-stat-label">Wins</div></div>
-          <div class="live-stat" style="min-width:unset;"><div class="live-stat-val loss" id="stats2-losses">0</div><div class="live-stat-label">Losses</div></div>
-          <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-streak">—</div><div class="live-stat-label">Best Streak</div></div>
-        </div>
-        <div style="margin-top:20px;">
-          <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Win/Loss Ratio</div>
-          <div style="background:var(--dark3);border-radius:20px;overflow:hidden;height:12px;">
-            <div id="win-bar" style="height:100%;background:var(--green);width:0%;transition:width 0.5s;border-radius:20px;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:4px;">
-            <span id="win-pct-label">0% wins</span><span id="loss-pct-label">0% losses</span>
+    <div class="dashboard-grid">
+      <!-- MAIN COLUMN: bot configuration -->
+      <div class="dashboard-main">
+        <div id="panel-bot" class="dash-panel active">
+          <div class="bot-controls">
+            <div class="bot-picker-header">
+              <h3>⚙️ Choose a Bot</h3>
+              <button type="button" class="btn-help-choose" onclick="openBotQuiz()">🧭 Help me choose</button>
+            </div>
+            <!-- Visual card picker: tap a card to select. The underlying <select>
+                 stays in the DOM (hidden) so every existing function that reads
+                 bot-select.value keeps working unchanged — this is a visual
+                 layer on top of the same value, not a new data source. -->
+            <div class="bot-card-grid" id="bot-card-grid"></div>
+            <select id="bot-select" onchange="updateBotInfo()" style="display:none;">
+              <option value="capitalguard">🛟 Capital Guard</option>
+              <option value="martingale">🤖 Martingale Pro</option>
+              <option value="dalembert">📈 D'Alembert</option>
+              <option value="accumulator">🔁 Accumulator</option>
+              <option value="boomcrash">💥 Boom/Crash</option>
+              <option value="evenodd">🎯 Even/Odd Digit</option>
+              <option value="overunder">🔬 Over/Under</option>
+              <option value="matchesdiffers">🎲 Matches/Differs</option>
+              <option value="oscarsgrind">🛡️ Oscar's Grind</option>
+              <option value="fixedratio">⚖️ Fixed-Ratio</option>
+            </select>
+            <div class="bot-info-box" id="bot-info-box"></div>
+            <h3 style="margin-top:24px;">⚙️ Trade Settings</h3>
+            <div class="controls-grid">
+              <div class="control-group"><label for="market-select">Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
+              <div class="control-group"><label for="stake">Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" inputmode="decimal" /></div>
+              <div class="control-group"><label for="take-profit">Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" step="0.01" inputmode="decimal" /></div>
+              <div class="control-group"><label for="stop-loss">Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" step="0.01" inputmode="decimal" /></div>
+              <div class="control-group"><label for="duration">Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
+              <div class="control-group"><label for="max-streak">Max Loss Streak</label><select id="max-streak"><option value="3">3 losses → pause</option><option value="5" selected>5 losses → pause</option><option value="7">7 losses → pause</option><option value="0">No limit</option></select></div>
+              <div class="control-group"><label for="auto-restart">Auto-Restart</label><select id="auto-restart"><option value="0">Off</option><option value="30">After 30 seconds</option><option value="60" selected>After 1 minute</option><option value="300">After 5 minutes</option></select></div>
+            </div>
+            <div class="bot-run-btns">
+              <button class="btn-run btn-run-start" id="btn-start" onclick="startBot()">▶ Run Bot</button>
+              <button class="btn-run btn-run-stop" onclick="stopBot()">■ Stop</button>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- SIDE COLUMN: equity curve, session stats, trade blotter -->
+      <aside class="dashboard-side">
+        <div class="equity-card">
+          <div class="equity-header">
+            <div><span class="panel-eyebrow">Session Equity</span></div>
+            <div class="equity-value profit" id="equity-value">$0.00</div>
+          </div>
+          <canvas id="equity-sparkline" width="340" height="56"></canvas>
+        </div>
+
+        <div id="panel-stats" class="dash-panel">
+          <div class="bot-controls" style="margin-bottom:0;">
+            <span class="panel-eyebrow">Overview</span>
+            <h3 style="margin-top:2px;">📊 Session Statistics</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+              <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-winrate">—</div><div class="live-stat-label">Win Rate</div></div>
+              <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-trades">0</div><div class="live-stat-label">Total Trades</div></div>
+              <div class="live-stat" style="min-width:unset;"><div class="live-stat-val profit" id="stats2-pnl">$0.00</div><div class="live-stat-label">Session P&L</div></div>
+              <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-wins">0</div><div class="live-stat-label">Wins</div></div>
+              <div class="live-stat" style="min-width:unset;"><div class="live-stat-val loss" id="stats2-losses">0</div><div class="live-stat-label">Losses</div></div>
+              <div class="live-stat" style="min-width:unset;"><div class="live-stat-val" id="stats2-streak">—</div><div class="live-stat-label">Best Streak</div></div>
+            </div>
+            <div style="margin-top:20px;">
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Win/Loss Ratio</div>
+              <div style="background:var(--dark3);border-radius:20px;overflow:hidden;height:12px;">
+                <div id="win-bar" style="height:100%;background:var(--green);width:0%;transition:width 0.5s;border-radius:20px;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:4px;">
+                <span id="win-pct-label">0% wins</span><span id="loss-pct-label">0% losses</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="panel-log" class="dash-panel">
+          <div class="trade-log">
+            <span class="panel-eyebrow">Blotter</span>
+            <h3 style="margin-top:2px;">📋 Trade Log</h3>
+            <div id="log-entries"><div class="log-empty">No trades yet. Configure and run a bot to start.</div></div>
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
 </div>
@@ -655,6 +721,7 @@
     <button class="modal-close" onclick="closeModal()">✕</button>
     <h2>Connect Your Account</h2>
     <p>Choose how you want to connect to Deriv.</p>
+    <div class="modal-disclosure">Your funds stay with Deriv — we never see your password. We earn a small fee on trades placed through the platform, and results aren't guaranteed. <a href="#faq" onclick="closeModal()" style="color:var(--gold);">Details</a></div>
     <div class="login-tabs">
       <button class="login-tab active" onclick="switchTab('oauth')">OAuth Login</button>
       <button class="login-tab" onclick="switchTab('token')">API Token</button>
@@ -699,6 +766,9 @@
   let lastValidTakeProfit = 10;          // fallback if the TP field is edited into something invalid mid-run
   let lastValidStopLoss = 10;            // fallback if the SL field is edited into something invalid mid-run
   let grindCycleProfit = 0;              // Oscar's Grind tracks its own small target separate from overall session P&L
+  let pnlHistory = [0];                  // running totalProfit after each settled trade, used to draw the equity sparkline
+  const CAPITAL_GUARD_MAX_TRADES = 20;   // hard session trade cap for Capital Guard, independent of stop-loss/take-profit
+  const CAPITAL_GUARD_COOLDOWN_MS = 8000; // extra pause after a loss on Capital Guard, on top of the normal 1.5s gap
 
   // ── CONNECTION RELIABILITY ──
   let lastWsUrl = null;             // remember the OTP URL so an unexpected drop can attempt to reconnect
@@ -794,6 +864,7 @@
     document.getElementById('dashboard').style.display = 'block';
     renderBotCardGrid();
     updateBotInfo();
+    drawEquitySparkline(); // canvas has real width only once the dashboard is visible
     await connectViaOtp(token);
   }
 
@@ -1044,10 +1115,94 @@
     }
   }
 
+  // ── EQUITY SPARKLINE ──
+  // Lightweight canvas line chart of running session P&L — no charting
+  // library needed for a single sparkline. Redraws on every settled trade
+  // and once at load/logout to show a flat baseline.
+  function drawEquitySparkline() {
+    const canvas = document.getElementById('equity-sparkline');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = canvas.clientWidth || 340;
+    const cssHeight = 56;
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    const data = pnlHistory.length > 1 ? pnlHistory : [0, 0];
+    const min = Math.min(0, ...data);
+    const max = Math.max(0, ...data);
+    const range = (max - min) || 1;
+    const last = data[data.length - 1];
+    const lineColor = last >= 0 ? '#00E676' : '#FF4444';
+    const fillColor = last >= 0 ? 'rgba(0,230,118,0.12)' : 'rgba(255,68,68,0.12)';
+
+    const points = data.map((v, i) => ({
+      x: (i / (data.length - 1)) * cssWidth,
+      y: cssHeight - ((v - min) / range) * (cssHeight - 8) - 4
+    }));
+
+    // Filled area under the line
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, cssHeight);
+    points.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(points[points.length - 1].x, cssHeight);
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+
+    // Zero baseline, dashed, only drawn if it's within the visible range
+    if (min < 0 && max > 0) {
+      const zeroY = cssHeight - ((0 - min) / range) * (cssHeight - 8) - 4;
+      ctx.beginPath();
+      ctx.setLineDash([3, 4]);
+      ctx.moveTo(0, zeroY);
+      ctx.lineTo(cssWidth, zeroY);
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // The line itself
+    ctx.beginPath();
+    points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Dot at the current value
+    const lastPoint = points[points.length - 1];
+    ctx.beginPath();
+    ctx.arc(lastPoint.x, lastPoint.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = lineColor;
+    ctx.fill();
+
+    const equityEl = document.getElementById('equity-value');
+    if (equityEl) {
+      equityEl.textContent = (last >= 0 ? '+' : '-') + '$' + Math.abs(last).toFixed(2);
+      equityEl.className = 'equity-value ' + (last >= 0 ? 'profit' : 'loss');
+    }
+  }
+
   function setStatus(text, color) {
     const el = document.getElementById('stat-status');
     el.textContent = text;
     el.style.color = color || 'var(--text)';
+    // Keep the top-nav status dot in sync — it's a compact always-visible
+    // echo of the same state, so a user glancing at the header (rather than
+    // scrolled down to the stats bar) still knows if the bot is live.
+    const navDot = document.getElementById('nav-status-dot');
+    const navText = document.getElementById('nav-status-text');
+    if (navDot && navText) {
+      navText.textContent = text.replace(/^[^\w]*\s*/, ''); // strip leading emoji, keep the words
+      navDot.classList.remove('live', 'stopped');
+      if (botRunning) navDot.classList.add('live');
+      else if (text.indexOf('Stop') !== -1 || text.indexOf('🛑') !== -1) navDot.classList.add('stopped');
+    }
   }
 
   // ── BOT METADATA ──
@@ -1055,6 +1210,9 @@
   // description, used by both the inline info box under the dropdown and
   // the "Help me choose" quiz result — so the two never drift out of sync.
   const BOT_INFO = {
+    capitalguard:  { risk: 'safe', label: 'Capital Preservation', icon: '🛟', name: "Capital Guard",
+      desc: "Flat stake with no escalation, the tightest default stop-loss/take-profit, a short cooldown after every loss, and a hard cap on trades per session. Important: this does not change the odds of any individual trade — it limits how much total capital is ever exposed.",
+      drawdown: "Lowest total exposure of any bot here by design. Stake never rises after a loss, the default stop-loss triggers early, a cooldown slows the pace after every loss, and a session trade cap stops the bot outright once reached. This narrows how much you can lose in total across a session — it does not make any single trade more likely to win. No bot on this site can do that; each trade carries its own independent risk." },
     martingale:    { risk: 'aggressive', label: 'Aggressive', icon: '🤖', name: "Martingale Pro",
       desc: "Doubles the stake after every loss, resets to base stake after a win. Can recover a losing streak quickly, but a long streak can escalate the stake fast — that's why this site enforces a hard stake ceiling.",
       drawdown: "Highest drawdown risk here. Stake doubles every loss, so cumulative cost compounds fast: 5 losses in a row costs 31× your base stake total, 7 losses costs 127×. The stake ceiling on this site stops it at 32× base, but even reaching that point means a steep drawdown from one losing streak." },
@@ -1095,6 +1253,22 @@
         '<div>' + info.desc + '</div>' +
         '<div class="info-drawdown"><strong>Drawdown:</strong> ' + info.drawdown + '</div>' +
       '</div>';
+    // Capital Guard preset — applied only when the bot is not running (the
+    // dropdown/grid are disabled while running anyway, so this can't
+    // silently override a live session). This nudges new users toward
+    // conservative numbers by default; every field is still a plain input
+    // they can change before hitting Run.
+    if (bot === 'capitalguard' && !botRunning) {
+      const stakeEl = document.getElementById('stake');
+      const tpEl = document.getElementById('take-profit');
+      const slEl = document.getElementById('stop-loss');
+      const streakEl = document.getElementById('max-streak');
+      const baseStakeVal = Math.max(0.35, parseFloat(stakeEl.value) || 1);
+      stakeEl.value = baseStakeVal.toFixed(2);
+      tpEl.value = (baseStakeVal * 2).toFixed(2);
+      slEl.value = (baseStakeVal * 3).toFixed(2);
+      streakEl.value = '3';
+    }
     // Keep the visual card grid in sync with whatever set bot-select.value
     // (a card tap, a quiz suggestion, or any future caller) so there's
     // never a mismatch between the highlighted tile and the active bot.
@@ -1443,6 +1617,9 @@
 
     // Update tracking
     totalProfit += profit;
+    pnlHistory.push(totalProfit);
+    if (pnlHistory.length > 200) pnlHistory.shift(); // cap history so the sparkline stays a session view, not unbounded
+    drawEquitySparkline();
     balance += profit;
     totalTrades++;
     if (isWin) totalWins++;
@@ -1476,6 +1653,21 @@
     let sl = parseFloat(document.getElementById('stop-loss').value);
     const maxStreakRaw = parseInt(document.getElementById('max-streak').value);
     const autoRestartDelay = parseInt(document.getElementById('auto-restart').value) || 0;
+
+    // Capital Guard: hard session trade cap, independent of stop-loss/
+    // take-profit. Those trigger on dollar thresholds; this triggers on
+    // trade count alone, so total exposure is bounded even if TP/SL are
+    // set loosely. Auto-restart still applies, same as any other stop
+    // condition, so the cap resets for the next session rather than
+    // permanently disabling the bot.
+    const botForCap = document.getElementById('bot-select').value;
+    if (botForCap === 'capitalguard' && totalTrades >= CAPITAL_GUARD_MAX_TRADES) {
+      botRunning = false;
+      setStatus('🛟 Session Trade Cap Reached', 'var(--green)');
+      addLog('🛟 Capital Guard: ' + CAPITAL_GUARD_MAX_TRADES + '-trade session cap reached — bot stopped', '', '');
+      scheduleAutoRestart(autoRestartDelay, 'Capital Guard session cap');
+      return;
+    }
 
     if (!isFinite(tp) || tp <= 0) {
       tp = lastValidTakeProfit;
@@ -1565,7 +1757,12 @@
       return;
     }
 
-    if (botRunning) setTimeout(placeTrade, 1500);
+    // Capital Guard adds a longer pause after a loss specifically — slowing
+    // the pace after a loss reduces how quickly total exposure can build up
+    // in a session, on top of the flat stake and tight stop-loss above. Wins
+    // still use the normal 1.5s gap.
+    const nextTradeDelay = (bot === 'capitalguard' && !isWin) ? CAPITAL_GUARD_COOLDOWN_MS : 1500;
+    if (botRunning) setTimeout(placeTrade, nextTradeDelay);
   }
 
   // ── RESPONSE WATCHDOG ──
@@ -1638,6 +1835,8 @@
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('landing').style.display = 'block';
     document.getElementById('log-entries').innerHTML = '<div class="log-empty">No trades yet. Configure and run a bot to start.</div>';
+    pnlHistory = [0];
+    drawEquitySparkline();
   }
 
   // ── MOBILE PANEL SWITCHING ──
@@ -1683,6 +1882,10 @@
       addLog('⚠️ No live price data for 30+ seconds — the browser may be throttling this tab. Bring it to the foreground.', '', '');
     }
   }, 10000);
+
+  window.addEventListener('resize', () => {
+    if (document.getElementById('dashboard').style.display === 'block') drawEquitySparkline();
+  });
 
   checkToken();
 </script>
