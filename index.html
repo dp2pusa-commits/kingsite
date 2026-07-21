@@ -243,10 +243,11 @@
     .quiz-result-card h4 { font-size: 16px; margin-bottom: 8px; color: var(--gold); }
     .quiz-result-card p { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
 
-    .bot-run-btns { display: flex; gap: 12px; }
-    .btn-run { padding: 12px 28px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
-    .btn-run-start { background: var(--green); color: var(--dark); }
-    .btn-run-stop { background: transparent; border: 1px solid #FF4444 !important; color: #FF6B6B; }
+    .bot-run-btns { display: flex; gap: 12px; position: sticky; bottom: 0; z-index: 20; margin: 20px -28px -28px; padding: 16px 28px; background: linear-gradient(to top, var(--dark2) 65%, rgba(17,17,24,0)); }
+    .btn-run { padding: 16px 28px; border-radius: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-run-start { flex: 2; background: var(--green); color: var(--dark); box-shadow: 0 4px 24px rgba(0,230,118,0.35); }
+    .btn-run-start:hover { box-shadow: 0 4px 32px rgba(0,230,118,0.5); transform: translateY(-1px); }
+    .btn-run-stop { flex: 1; background: transparent; border: 1px solid #FF4444 !important; color: #FF6B6B; }
     .trade-log { background: var(--dark2); border: 1px solid var(--border); border-radius: 14px; padding: 24px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
     .trade-log h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
     #log-entries { max-height: 420px; overflow-y: auto; padding-right: 4px; }
@@ -320,6 +321,8 @@
 
       /* Bot controls */
       .bot-controls { padding: 16px; border-radius: 10px; margin-bottom: 16px; }
+      .bot-run-btns { margin: 16px -16px -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); bottom: 64px; }
+      .btn-run { padding: 16px; font-size: 15px; }
       .bot-controls h3 { font-size: 15px; margin-bottom: 14px; }
       .controls-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
       .control-group label { font-size: 11px; }
@@ -336,6 +339,7 @@
       /* Big tap-friendly run buttons */
       .bot-run-btns { gap: 10px; }
       .btn-run { flex: 1; padding: 16px; font-size: 16px; border-radius: 12px; }
+      .btn-run-start { flex: 2; }
 
       /* Trade log */
       .trade-log { padding: 16px; border-radius: 10px; }
@@ -605,7 +609,6 @@
               <div class="control-group"><label for="take-profit">Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" step="0.01" inputmode="decimal" /></div>
               <div class="control-group"><label for="stop-loss">Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" step="0.01" inputmode="decimal" /></div>
               <div class="control-group"><label for="duration">Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
-              <div class="control-group"><label for="max-streak">Max Loss Streak</label><select id="max-streak"><option value="3">3 losses → pause</option><option value="5" selected>5 losses → pause</option><option value="7">7 losses → pause</option><option value="0">No limit</option></select></div>
               <div class="control-group"><label for="auto-restart">Auto-Restart</label><select id="auto-restart"><option value="0">Off</option><option value="30">After 30 seconds</option><option value="60" selected>After 1 minute</option><option value="300">After 5 minutes</option></select></div>
             </div>
             <div class="bot-run-btns">
@@ -1262,12 +1265,10 @@
       const stakeEl = document.getElementById('stake');
       const tpEl = document.getElementById('take-profit');
       const slEl = document.getElementById('stop-loss');
-      const streakEl = document.getElementById('max-streak');
       const baseStakeVal = Math.max(0.35, parseFloat(stakeEl.value) || 1);
       stakeEl.value = baseStakeVal.toFixed(2);
       tpEl.value = (baseStakeVal * 2).toFixed(2);
       slEl.value = (baseStakeVal * 3).toFixed(2);
-      streakEl.value = '3';
     }
     // Keep the visual card grid in sync with whatever set bot-select.value
     // (a card tap, a quiz suggestion, or any future caller) so there's
@@ -1651,7 +1652,6 @@
     // value instead, and tell the user once so they know why.
     let tp = parseFloat(document.getElementById('take-profit').value);
     let sl = parseFloat(document.getElementById('stop-loss').value);
-    const maxStreakRaw = parseInt(document.getElementById('max-streak').value);
     const autoRestartDelay = parseInt(document.getElementById('auto-restart').value) || 0;
 
     // Capital Guard: hard session trade cap, independent of stop-loss/
@@ -1681,8 +1681,6 @@
     } else {
       lastValidStopLoss = sl;
     }
-    const maxStreak = isFinite(maxStreakRaw) ? maxStreakRaw : 0;
-
     // Take profit hit
     if (totalProfit >= tp) {
       botRunning = false;
@@ -1698,15 +1696,6 @@
       setStatus('🛑 Stop Loss', 'var(--red)');
       addLog('🛑 Stop loss triggered!', '', '-$' + Math.abs(totalProfit).toFixed(2));
       scheduleAutoRestart(autoRestartDelay, 'stop loss');
-      return;
-    }
-
-    // Consecutive loss streak protection
-    if (maxStreak > 0 && consecutiveLosses >= maxStreak) {
-      botRunning = false;
-      setStatus('⚠️ Streak Paused', '#FF9800');
-      addLog('⚠️ ' + maxStreak + ' consecutive losses — bot paused', '', '');
-      scheduleAutoRestart(autoRestartDelay, 'loss streak');
       return;
     }
 
