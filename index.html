@@ -88,34 +88,20 @@
     .feature-card p { color: var(--text-dim); font-size: 14px; line-height: 1.6; }
 
     #bots { background: var(--dark); }
-    .bots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
-    .bot-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; transition: all 0.3s; position: relative; overflow: hidden; }
-    .bot-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold); transform: scaleX(0); transition: transform 0.3s; }
-    .bot-card:hover::before { transform: scaleX(1); }
-    .bot-card:hover { border-color: var(--gold); }
-    .bot-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-    .bot-icon { font-size: 28px; }
-    .bot-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; font-family: 'Space Mono', monospace; }
+    .bots-list { display: flex; flex-direction: column; gap: 10px; max-width: 900px; margin: 0 auto; }
+    .bot-row { display: flex; align-items: center; gap: 16px; background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; transition: border-color 0.2s, transform 0.2s; }
+    .bot-row:hover { border-color: var(--gold); transform: translateX(2px); }
+    .bot-row-icon { font-size: 22px; width: 28px; text-align: center; flex-shrink: 0; }
+    .bot-row-name { font-size: 16px; font-weight: 700; flex: 1 1 auto; min-width: 140px; }
+    .bot-row-market { font-size: 12px; color: var(--text-dim); font-family: 'Space Mono', monospace; flex: 0 0 auto; }
+    .bot-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; font-family: 'Space Mono', monospace; flex-shrink: 0; white-space: nowrap; }
     .badge-aggressive { background: rgba(255,68,68,0.15); color: #FF6B6B; border: 1px solid rgba(255,68,68,0.3); }
     .badge-moderate { background: rgba(255,215,0,0.1); color: var(--gold); border: 1px solid var(--border); }
     .badge-safe { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }
-    .bot-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-    .bot-card p { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
-    .bot-stats { display: flex; gap: 16px; margin-bottom: 20px; }
-    .bot-stat { flex: 1; background: var(--dark3); border-radius: 8px; padding: 10px; text-align: center; }
-    .bot-stat .stat-val { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--green); }
-    .bot-stat .stat-label { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-    .bot-market { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
-    .bot-market span { color: var(--gold); font-family: 'Space Mono', monospace; }
-    .bot-drawdown { font-size: 12px; color: var(--text-dim); line-height: 1.6; padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--border); }
-    .bot-drawdown strong { color: #FF9800; }
-    .bot-details { margin-top: 14px; }
-    .bot-details summary { cursor: pointer; list-style: none; font-size: 12px; font-weight: 700; color: var(--gold); font-family: 'Space Mono', monospace; letter-spacing: 0.5px; text-transform: uppercase; padding: 4px 0; user-select: none; }
-    .bot-details summary::-webkit-details-marker { display: none; }
-    .bot-details summary::before { content: '▸ '; display: inline-block; transition: transform 0.2s; }
-    .bot-details[open] summary::before { transform: rotate(90deg); }
-    .bot-details summary:hover { color: #fff; }
-    .bot-details p { margin-top: 10px; margin-bottom: 0; }
+    @media (max-width: 600px) {
+      .bot-row { flex-wrap: wrap; }
+      .bot-row-market { order: 3; flex-basis: 100%; padding-left: 44px; }
+    }
 
     #how-it-works { background: var(--dark2); }
     .steps { display: flex; max-width: 900px; margin: 0 auto; flex-wrap: wrap; }
@@ -461,17 +447,17 @@
       <div class="section-label">Trading Bots</div>
       <div class="section-title">Pre-built strategies, automated</div>
       <div class="section-subtitle">Eleven strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
-      <div class="bots-grid">
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🛟</div><span class="bot-badge badge-safe">Capital Preservation</span></div><h3>Capital Guard</h3><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><details class="bot-details"><summary>Details</summary><p>Flat stake, tight built-in stop-loss/take-profit defaults, a short cooldown after every loss, and a hard cap on trades per session. Designed to limit how much you can lose in total — it does not improve the odds of any individual trade.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Lowest total exposure of any bot here by design — flat stake (no compounding), the tightest default stop-loss, a per-loss cooldown to slow trading pace, and a session trade cap. Each individual trade still carries the same win/loss odds as any other bot; this one just limits how much total capital is ever at risk.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🤖</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Martingale Pro</h3><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><details class="bot-details"><summary>Details</summary><p>Classic Martingale with stake doubling on losses. Configurable max steps and base stake. Higher risk of large losses during long losing streaks.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Highest here. Stake doubles per loss — 5 losses in a row costs 31× base stake cumulatively, 7 losses costs 127×. This site caps the stake at 32× base, but reaching that point is still a steep drawdown from one streak.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">📈</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>D'Alembert</h3><div class="bot-market">Market: <span>R_10 / R_25</span></div><details class="bot-details"><summary>Details</summary><p>Increase stake by 1 unit on loss, decrease by 1 unit on win. Lower variance than Martingale, but still carries risk of loss.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Moderate. Stake rises by one unit per loss rather than doubling — slower to escalate than Martingale, but a long losing streak still adds up.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔁</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Accumulator</h3><div class="bot-market">Market: <span>R_10 / R_50 / R_100</span></div><details class="bot-details"><summary>Details</summary><p>Flat-stake accumulation strategy with configurable growth rate settings.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Lowest of the staking styles. Flat stake means a losing streak costs (losses × stake) with no compounding at all.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">💥</div><span class="bot-badge badge-aggressive">Aggressive</span></div><h3>Boom/Crash</h3><div class="bot-market">Market: <span>BOOM 500 / CRASH 500</span></div><details class="bot-details"><summary>Details</summary><p>Configured for Boom/Crash indices, with automated entry/exit logic.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Stake stays flat, but Boom/Crash spike indices can move sharply, so individual trade outcomes can be less predictable than smoother Volatility indices.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎯</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Even/Odd Digit</h3><div class="bot-market">Market: <span>R_10 / R_25</span></div><details class="bot-details"><summary>Details</summary><p>Predicts Even or Odd last digit with streak detection logic.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Flat stake — losing-streak cost scales linearly with no compounding, same as Accumulator.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🔬</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Over/Under</h3><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><details class="bot-details"><summary>Details</summary><p>Predicts whether the last digit will be Over or Under a configured barrier.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Flat stake — same linear, non-compounding drawdown profile as the other digit bots.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🎲</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Matches/Differs</h3><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><details class="bot-details"><summary>Details</summary><p>Predicts whether the last digit will match or differ from a chosen target digit. A different digit-contract signal from Even/Odd or Over/Under.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Flat stake — same non-compounding profile. "Differs" wins more often than "Matches" on a 10-digit barrier, which affects how often a losing streak happens, not how costly each one is.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">🛡️</div><span class="bot-badge badge-safe">Lower-variance</span></div><h3>Oscar's Grind</h3><div class="bot-market">Market: <span>R_10 / R_25</span></div><details class="bot-details"><summary>Details</summary><p>A gentler money-management style than Martingale: stake increases by one unit only after a win, and resets once a small profit target is reached. Designed to recover slowly and cautiously rather than chase losses.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Among the lowest by design. Stake never rises after a loss, so a losing streak costs exactly (losses × current stake) — no escalation at all, the opposite of Martingale.</div></details></div>
-        <div class="bot-card"><div class="bot-header"><div class="bot-icon">⚖️</div><span class="bot-badge badge-moderate">Moderate</span></div><h3>Fixed-Ratio</h3><div class="bot-market">Market: <span>R_10 / R_25 / R_50</span></div><details class="bot-details"><summary>Details</summary><p>Stake scales with session profit — it grows only as profit builds up, and shrinks back toward your base stake as losses mount, instead of chasing losses like Martingale.</p><div class="bot-drawdown"><strong>Drawdown:</strong> Moderate-to-low. Stake can only grow after profit has already built up, and shrinks back toward base stake as losses erode that profit — gains are given back gradually rather than escalating the original bet.</div></details></div>
+      <div class="bots-list">
+        <div class="bot-row"><div class="bot-row-icon">🛟</div><div class="bot-row-name">Capital Guard</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-safe">Capital Preservation</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🔁</div><div class="bot-row-name">Accumulator</div><div class="bot-row-market">R_10 / R_50 / R_100</div><span class="bot-badge badge-safe">Lower-variance</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🔬</div><div class="bot-row-name">Over/Under</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-safe">Lower-variance</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🛡️</div><div class="bot-row-name">Oscar's Grind</div><div class="bot-row-market">R_10 / R_25</div><span class="bot-badge badge-safe">Lower-variance</span></div>
+        <div class="bot-row"><div class="bot-row-icon">📈</div><div class="bot-row-name">D'Alembert</div><div class="bot-row-market">R_10 / R_25</div><span class="bot-badge badge-moderate">Moderate</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🎯</div><div class="bot-row-name">Even/Odd Digit</div><div class="bot-row-market">R_10 / R_25</div><span class="bot-badge badge-moderate">Moderate</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🎲</div><div class="bot-row-name">Matches/Differs</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-moderate">Moderate</span></div>
+        <div class="bot-row"><div class="bot-row-icon">⚖️</div><div class="bot-row-name">Fixed-Ratio</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-moderate">Moderate</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🤖</div><div class="bot-row-name">Martingale Pro</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
+        <div class="bot-row"><div class="bot-row-icon">💥</div><div class="bot-row-name">Boom/Crash</div><div class="bot-row-market">BOOM 500 / CRASH 500</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
       </div>
     </div>
   </section>
