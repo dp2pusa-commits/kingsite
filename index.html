@@ -446,7 +446,7 @@
     <div style="max-width:1200px;margin:0 auto;">
       <div class="section-label">Trading Bots</div>
       <div class="section-title">Pre-built strategies, automated</div>
-      <div class="section-subtitle">Eleven strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
+      <div class="section-subtitle">Twelve strategy templates ready to configure on your Deriv account. None of these guarantee a profit — they're different approaches to entry signals and stake management, not predictions of future results.</div>
       <div class="bots-list">
         <div class="bot-row"><div class="bot-row-icon">🛟</div><div class="bot-row-name">Capital Guard</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-safe">Capital Preservation</span></div>
         <div class="bot-row"><div class="bot-row-icon">🔁</div><div class="bot-row-name">Accumulator</div><div class="bot-row-market">R_10 / R_50 / R_100</div><span class="bot-badge badge-safe">Lower-variance</span></div>
@@ -458,6 +458,7 @@
         <div class="bot-row"><div class="bot-row-icon">⚖️</div><div class="bot-row-name">Fixed-Ratio</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-moderate">Moderate</span></div>
         <div class="bot-row"><div class="bot-row-icon">🤖</div><div class="bot-row-name">Martingale Pro</div><div class="bot-row-market">R_10 / R_25 / R_50</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
         <div class="bot-row"><div class="bot-row-icon">💥</div><div class="bot-row-name">Boom/Crash</div><div class="bot-row-market">BOOM 500 / CRASH 500</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
+        <div class="bot-row"><div class="bot-row-icon">🔀</div><div class="bot-row-name">Forex Alternator</div><div class="bot-row-market">EUR/USD / GBP/USD / AUD/USD / USD/CAD / XAU/USD</div><span class="bot-badge badge-aggressive">Aggressive</span></div>
       </div>
     </div>
   </section>
@@ -593,17 +594,40 @@
               <option value="matchesdiffers">🎲 Matches/Differs</option>
               <option value="oscarsgrind">🛡️ Oscar's Grind</option>
               <option value="fixedratio">⚖️ Fixed-Ratio</option>
+              <option value="alternator">🔀 Forex Alternator</option>
             </select>
             <div class="bot-info-box" id="bot-info-box"></div>
             <h3 style="margin-top:24px;">⚙️ Trade Settings</h3>
             <div class="controls-grid">
-              <div class="control-group"><label for="market-select">Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option></select></div>
+              <div class="control-group"><label for="market-select">Market</label><select id="market-select"><option value="R_10">Volatility 10</option><option value="R_25">Volatility 25</option><option value="R_50">Volatility 50</option><option value="R_75">Volatility 75</option><option value="R_100">Volatility 100</option><option value="BOOM500">Boom 500</option><option value="CRASH500">Crash 500</option><option value="EURUSD">EUR/USD</option><option value="GBPUSD">GBP/USD</option><option value="AUDUSD">AUD/USD</option><option value="USDCAD">USD/CAD</option><option value="XAUUSD">XAU/USD (Gold)</option></select></div>
               <div class="control-group"><label for="stake">Base Stake (USD)</label><input type="number" id="stake" value="1" min="0.35" step="0.01" inputmode="decimal" /></div>
               <div class="control-group"><label for="take-profit">Take Profit (USD)</label><input type="number" id="take-profit" value="10" min="1" step="0.01" inputmode="decimal" /></div>
               <div class="control-group"><label for="stop-loss">Stop Loss (USD)</label><input type="number" id="stop-loss" value="10" min="1" step="0.01" inputmode="decimal" /></div>
-              <div class="control-group"><label for="duration">Duration</label><select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select></div>
+              <div class="control-group">
+                <label for="duration">Duration</label>
+                <select id="duration"><option value="1t">1 Tick</option><option value="5t">5 Ticks</option><option value="10t">10 Ticks</option><option value="1m">1 Minute</option></select>
+                <div id="duration-override-note" style="display:none; font-size:11px; color:var(--text-dim); margin-top:4px;">Locked to 30 seconds for this bot — this field is ignored.</div>
+              </div>
               <div class="control-group"><label for="auto-restart">Auto-Restart</label><select id="auto-restart"><option value="0">Off</option><option value="30">After 30 seconds</option><option value="60" selected>After 1 minute</option><option value="300">After 5 minutes</option></select></div>
             </div>
+
+            <!-- Custom stake ladder — only shown/used for the Forex Alternator bot.
+                 Levels are entirely user-defined (add/remove/edit), persisted in
+                 sessionStorage so the current level survives a page reload, and
+                 never sent anywhere but this browser. -->
+            <div id="custom-levels-panel" style="display:none; margin-top:20px;">
+              <h3 style="margin-bottom:4px;">🪜 Stake Ladder</h3>
+              <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">
+                Define your own progression. Level 1 is used after every win. A loss moves to the next level down the list; the bot holds at the last level if a losing streak runs past it.
+              </div>
+              <div id="custom-levels-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+              <div style="display:flex; gap:10px; margin-top:10px; align-items:center; flex-wrap:wrap;">
+                <button type="button" class="btn-outline" onclick="addCustomLevel()">+ Add Level</button>
+                <button type="button" class="btn-outline" onclick="resetCustomLevelProgress()">↺ Reset Progression to Level 1</button>
+                <span id="custom-level-current" style="font-size:12px; color:var(--text-dim);"></span>
+              </div>
+            </div>
+
             <div class="bot-run-btns">
               <button class="btn-run btn-run-start" id="btn-start" onclick="startBot()">▶ Run Bot</button>
               <button class="btn-run btn-run-stop" onclick="stopBot()">■ Stop</button>
@@ -741,6 +765,13 @@
   const API_BASE = 'https://api.derivws.com';
   let socket = null, botRunning = false, currentToken = null, currentAccountId = null;
   let balance = 0, totalProfit = 0, baseStake = 1, currentStake = 1;
+  // Forex Alternator: user-defined stake ladder + deterministic Buy/Sell alternation.
+  // Levels and the current level index persist in sessionStorage so a losing
+  // streak's progress survives a page reload — it only resets on a win or an
+  // explicit manual reset from the panel, never on its own.
+  let customStakeLevels = [];
+  let customLevelIndex = 0;
+  let alternatorNextType = 'CALL';
   let reqIdCounter = 1;
   const pendingProposals = {};
 
@@ -997,7 +1028,7 @@
       reconnectAttempts = 0; // a successful open clears the retry counter
       if (isReconnect) addLog('✅ Reconnected', '', '');
       send({ balance: 1, subscribe: 1 });
-      ['1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V','BOOM500','CRASH500'].forEach(sym => send({ ticks: sym, subscribe: 1 }));
+      ['1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V','BOOM500','CRASH500','frxEURUSD','frxGBPUSD','frxAUDUSD','frxUSDCAD','frxXAUUSD'].forEach(sym => send({ ticks: sym, subscribe: 1 }));
     };
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
@@ -1076,7 +1107,7 @@
   }
 
   // ── MARKET SYMBOL MAP ──
-  const marketSymbolMap = { 'R_10':'1HZ10V','R_25':'1HZ25V','R_50':'1HZ50V','R_75':'1HZ75V','R_100':'1HZ100V','BOOM500':'BOOM500','CRASH500':'CRASH500' };
+  const marketSymbolMap = { 'R_10':'1HZ10V','R_25':'1HZ25V','R_50':'1HZ50V','R_75':'1HZ75V','R_100':'1HZ100V','BOOM500':'BOOM500','CRASH500':'CRASH500','EURUSD':'frxEURUSD','GBPUSD':'frxGBPUSD','AUDUSD':'frxAUDUSD','USDCAD':'frxUSDCAD','XAUUSD':'frxXAUUSD' };
 
   // ── BOT ──
   function updateStats() {
@@ -1235,7 +1266,10 @@
       drawdown: "Among the lowest drawdown risk here by design. Because stake never increases after a loss, a losing streak costs exactly (number of losses × current stake) with no escalation at all — the opposite risk shape from Martingale." },
     fixedratio:    { risk: 'moderate', label: 'Moderate', icon: '⚖️', name: "Fixed-Ratio",
       desc: "Stake size is tied to overall session profit — it only grows once profit clears a threshold, and shrinks back toward base stake as losses reduce that profit. Grows with success rather than chasing losses.",
-      drawdown: "Moderate-to-low drawdown risk. Stake can only grow after profit has already accumulated, and shrinks back toward base stake as losses eat into that profit — so a losing streak that follows a winning streak gives back gains gradually rather than escalating the original bet." }
+      drawdown: "Moderate-to-low drawdown risk. Stake can only grow after profit has already accumulated, and shrinks back toward base stake as losses eat into that profit — so a losing streak that follows a winning streak gives back gains gradually rather than escalating the original bet." },
+    alternator:    { risk: 'aggressive', label: 'Aggressive', icon: '🔀', name: "Forex Alternator",
+      desc: "No market analysis — Rise/Fall contracts on Forex pairs only, alternating Buy → Sell → Buy → Sell on a fixed 30-second timer regardless of the previous result. Never more than one open position at a time. Stake follows a ladder you define yourself: it advances one level after a loss and resets to Level 1 after a win. Duration is locked to 30 seconds for this bot, overriding the Duration field above.",
+      drawdown: "Drawdown risk depends entirely on the stake ladder you configure below — there is no built-in ceiling like the Martingale/D'Alembert bots. A losing streak that runs past your last defined level holds at that level rather than escalating further, but a long enough streak at your own numbers can still be costly. Set your ladder deliberately." }
   };
 
   function updateBotInfo() {
@@ -1263,12 +1297,93 @@
       tpEl.value = (baseStakeVal * 2).toFixed(2);
       slEl.value = (baseStakeVal * 3).toFixed(2);
     }
+
+    // Forex Alternator: show the stake-ladder editor and the fixed-duration
+    // note only while this bot is selected; every other bot keeps the plain
+    // Base Stake / Duration fields exactly as before.
+    const levelsPanel = document.getElementById('custom-levels-panel');
+    const durationNote = document.getElementById('duration-override-note');
+    const durationSelect = document.getElementById('duration');
+    if (levelsPanel) levelsPanel.style.display = (bot === 'alternator') ? 'block' : 'none';
+    if (durationNote) durationNote.style.display = (bot === 'alternator') ? 'block' : 'none';
+    if (durationSelect) durationSelect.disabled = (bot === 'alternator');
+    if (bot === 'alternator') renderCustomLevels();
+
     // Keep the visual card grid in sync with whatever set bot-select.value
     // (a card tap, a quiz suggestion, or any future caller) so there's
     // never a mismatch between the highlighted tile and the active bot.
     document.querySelectorAll('.bot-tile').forEach(tile => {
       tile.classList.toggle('selected', tile.dataset.bot === bot);
     });
+  }
+
+  // ── FOREX ALTERNATOR: CUSTOM STAKE LADDER ──
+  function loadCustomLevels() {
+    try {
+      const savedLevels = sessionStorage.getItem('alternator_levels');
+      customStakeLevels = savedLevels ? JSON.parse(savedLevels) : [1, 2, 3, 5];
+      if (!Array.isArray(customStakeLevels) || !customStakeLevels.length) customStakeLevels = [1, 2, 3, 5];
+    } catch (e) {
+      customStakeLevels = [1, 2, 3, 5];
+    }
+    const savedIndex = parseInt(sessionStorage.getItem('alternator_level_index'));
+    customLevelIndex = isFinite(savedIndex) && savedIndex >= 0 ? savedIndex : 0;
+    if (customLevelIndex >= customStakeLevels.length) customLevelIndex = customStakeLevels.length - 1;
+  }
+
+  function saveCustomLevels() {
+    try {
+      sessionStorage.setItem('alternator_levels', JSON.stringify(customStakeLevels));
+      sessionStorage.setItem('alternator_level_index', String(customLevelIndex));
+    } catch (e) { /* sessionStorage unavailable — ladder still works for this session */ }
+  }
+
+  function renderCustomLevels() {
+    const list = document.getElementById('custom-levels-list');
+    const currentLabel = document.getElementById('custom-level-current');
+    if (!list) return;
+    list.innerHTML = customStakeLevels.map((amt, i) => (
+      '<div style="display:flex; align-items:center; gap:8px;">' +
+        '<span style="min-width:56px; font-size:12px; color:var(--text-dim);">Level ' + (i + 1) + (i === customLevelIndex ? ' •' : '') + '</span>' +
+        '<input type="number" min="0.35" step="0.01" inputmode="decimal" value="' + amt + '" ' +
+          'onchange="updateCustomLevel(' + i + ', this.value)" ' + (botRunning ? 'disabled' : '') + ' style="flex:1;" />' +
+        '<button type="button" class="btn-outline" style="padding:4px 10px;" ' + (botRunning || customStakeLevels.length <= 1 ? 'disabled' : '') +
+          ' onclick="removeCustomLevel(' + i + ')">✕</button>' +
+      '</div>'
+    )).join('');
+    if (currentLabel) {
+      currentLabel.textContent = 'Current: Level ' + (customLevelIndex + 1) + ' ($' + (customStakeLevels[customLevelIndex] || 0).toFixed(2) + ')';
+    }
+  }
+
+  function updateCustomLevel(i, value) {
+    const v = parseFloat(value);
+    customStakeLevels[i] = isFinite(v) && v >= 0.35 ? v : 0.35;
+    saveCustomLevels();
+    renderCustomLevels();
+  }
+
+  function addCustomLevel() {
+    if (botRunning) return;
+    const last = customStakeLevels[customStakeLevels.length - 1] || 1;
+    customStakeLevels.push(Math.round(last * 2 * 100) / 100);
+    saveCustomLevels();
+    renderCustomLevels();
+  }
+
+  function removeCustomLevel(i) {
+    if (botRunning || customStakeLevels.length <= 1) return;
+    customStakeLevels.splice(i, 1);
+    if (customLevelIndex >= customStakeLevels.length) customLevelIndex = customStakeLevels.length - 1;
+    saveCustomLevels();
+    renderCustomLevels();
+  }
+
+  function resetCustomLevelProgress() {
+    if (botRunning) { alert('Stop the bot before resetting the ladder.'); return; }
+    customLevelIndex = 0;
+    saveCustomLevels();
+    renderCustomLevels();
   }
 
   // ── VISUAL BOT CARD GRID ──
@@ -1402,6 +1517,17 @@
     lastValidTakeProfit = tpRaw;
     lastValidStopLoss = slRaw;
 
+    const botAtStart = document.getElementById('bot-select').value;
+    if (botAtStart === 'alternator') {
+      if (!customStakeLevels.length || customStakeLevels.some(v => !isFinite(v) || v < 0.35)) {
+        addLog('❌ Cannot start — every stake ladder level must be at least $0.35', '', '');
+        setStatus('⚠️ Invalid Stake Ladder', '#FF9800');
+        if (!isAutoRestart) alert('Every level in your stake ladder must be a valid number of at least $0.35.');
+        return;
+      }
+      alternatorNextType = 'CALL'; // each run starts a fresh Buy/Sell sequence; the ladder level itself is untouched
+    }
+
     // If this is an automatic restart (after take-profit/stop-loss/streak-pause),
     // check the balance can actually cover the configured base stake first.
     // Without this, a low-balance account would auto-restart, immediately hit
@@ -1416,7 +1542,7 @@
     botRunning = true;
     botPaused = false;
     baseStake = startStake;
-    currentStake = baseStake;
+    currentStake = (botAtStart === 'alternator') ? customStakeLevels[customLevelIndex] : baseStake;
     totalProfit = 0; totalTrades = 0; totalWins = 0;
     consecutiveLosses = 0; currentStreak = 0; streakType = null;
     grindCycleProfit = 0;
@@ -1449,6 +1575,9 @@
       tile.style.cursor = locked ? 'not-allowed' : 'pointer';
       tile.style.pointerEvents = locked ? 'none' : '';
     });
+    const durationSelect = document.getElementById('duration');
+    if (durationSelect) durationSelect.disabled = (select && select.value === 'alternator');
+    if (select && select.value === 'alternator') renderCustomLevels(); // re-render so level inputs/buttons pick up the lock state
   }
 
   function stopBot(reason) {
@@ -1502,6 +1631,12 @@
       contractType = Math.random() > 0.5 ? 'DIGITOVER' : 'DIGITUNDER';
     } else if (bot === 'matchesdiffers') {
       contractType = Math.random() > 0.5 ? 'DIGITMATCH' : 'DIGITDIFF';
+    } else if (bot === 'alternator') {
+      // Fixed Buy -> Sell -> Buy -> Sell sequence, independent of the
+      // previous trade's win/loss — never randomized, unlike the other
+      // CALL/PUT bots below.
+      contractType = alternatorNextType;
+      alternatorNextType = (alternatorNextType === 'CALL') ? 'PUT' : 'CALL';
     } else {
       // martingale, dalembert, accumulator, boomcrash, oscarsgrind, fixedratio
       // all use CALL/PUT (Rise/Fall) — they differ in stake management, not
@@ -1513,7 +1648,12 @@
     // Use safe defaults based on contract type
     let durNum, durUnit;
     const durVal = document.getElementById('duration').value;
-    if (contractType === 'DIGITEVEN' || contractType === 'DIGITODD' ||
+    if (bot === 'alternator') {
+      // Spec requirement: every contract is exactly 30 seconds, regardless
+      // of whatever the (disabled) Duration dropdown happens to hold.
+      durNum = 30;
+      durUnit = 's';
+    } else if (contractType === 'DIGITEVEN' || contractType === 'DIGITODD' ||
         contractType === 'DIGITOVER' || contractType === 'DIGITUNDER' ||
         contractType === 'DIGITMATCH' || contractType === 'DIGITDIFF') {
       // Digit contracts: 1–10 ticks only
@@ -1699,7 +1839,15 @@
     const bot = document.getElementById('bot-select').value;
     const stakeCeiling = baseStake * MAX_STAKE_MULTIPLE;
 
-    if (bot === 'martingale') {
+    if (bot === 'alternator') {
+      // User-defined ladder: advance one level on a loss (holding at the
+      // last level once the streak runs past it), reset to Level 1 on a
+      // win. Persisted immediately so a reload resumes at the same level.
+      customLevelIndex = isWin ? 0 : Math.min(customLevelIndex + 1, customStakeLevels.length - 1);
+      currentStake = customStakeLevels[customLevelIndex];
+      saveCustomLevels();
+      renderCustomLevels();
+    } else if (bot === 'martingale') {
       currentStake = !isWin ? currentStake * 2 : baseStake;
     } else if (bot === 'dalembert') {
       currentStake = !isWin ? currentStake + baseStake : Math.max(baseStake, currentStake - baseStake);
@@ -1731,7 +1879,11 @@
       currentStake = baseStake + profitUnits * baseStake;
     }
 
-    if (currentStake > stakeCeiling) {
+    // The generic ceiling is derived from the Base Stake field, which the
+    // alternator doesn't use to compute its stake (its ladder values are
+    // independent user input) — it's already bounded by its own level
+    // count, so this check would misfire against an unrelated number.
+    if (bot !== 'alternator' && currentStake > stakeCeiling) {
       botRunning = false;
       setStatus('⚠️ Max Stake Reached', '#FF9800');
       addLog('⚠️ Stake hit safety ceiling ($' + stakeCeiling.toFixed(2) + ') — bot stopped', '', '');
@@ -1869,6 +2021,7 @@
     if (document.getElementById('dashboard').style.display === 'block') drawEquitySparkline();
   });
 
+  loadCustomLevels();
   checkToken();
 </script>
 </body>
